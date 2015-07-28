@@ -6,23 +6,112 @@ from bs4 import BeautifulSoup
 addon_id = 'plugin.video.tugaio'
 selfAddon = xbmcaddon.Addon(addon_id)
 addonfolder = selfAddon.getAddonInfo('path')
-artfolder = addonfolder + '/resources'
-fanart = addonfolder + '/fanart.png'
-versao = '0.0.1'
+artfolder = addonfolder + '/resources/img/'
+fanart = addonfolder + 'fundo.png'
+versao = '0.0.2'
 
 site = 'http://tuga.io/'
 
 def categorias():
-	addDir('Filmes', site, 1, fanart, 0)
-	addDir('Series', site, 2, fanart, 0)
+	addDir('Filmes', site, 1, artfolder+'filmes.png', 0)
+	addDir('Series', site, 2, artfolder+'series.png', 0)
+	addDir('', '', '', artfolder+'nada.png', 0)
 
 def getFilmes(url, pagina):
+	mensagemprogresso = xbmcgui.DialogProgress()
+	mensagemprogresso.create('Tuga.io', 'A abrir lista de filmes','Por favor aguarde...')
+	
+
+	i=1
+	mensagemprogresso.update(i)
+
+
 	codigo_fonte_listaFilmes=abrir_url(url+'filmes')
 	match_filmes=re.compile('<li>\n<a href="(.+?)">\n<div class="thumb">\n<div class="img" style="background-image: url\(\'(.+?)\'\);"></div>\n</div>\n<div class="info">\n<div class="title">(.+?)</div>\n<div class="infos">\n<div class="year">(.+?)</div>\n<div class="imdb">(.+?)</div>\n</div>\n</div>\n</a>\n</li>\n').findall(codigo_fonte_listaFilmes)
+
+	tamanhoArray = len(match_filmes)+0.0
+
 	for link,imagem,nome,ano,imdb in match_filmes:
+		percentagem = int((i/tamanhoArray)*100)
 		link = link[1:]
 		codigo_fonte=abrir_url(site+link)
 		#match=re.compile('jwplayer\(\'player_get_hard\'\).setup\(\{\n                            file: \'(.+?)\',\n                            aspectratio: \'.+?\',\n                            width: \'.+?\',\n                            height: \'.+?\',\n                            skin: \'.+?\',\n                            primary: ".+?",\n                            androidhls:.+?,\n                            logo : \{\n                                file: ".+?",\n                                link: ".+?",\n                                hide: .+?\n                            \},\n                            tracks:\n                                    \[\n                                        \{\n                                            file: "(.+?)",\n                                            default: ".+?"\n                                        \}\n                                    \],\n                            captions: \{\n                                backgroundOpacity: .+?                            \}\n\n                        \}\);').findall(codigo_fonte)
+		getStream=re.compile('file: \'(.+?)\'').findall(codigo_fonte) 
+		getLegenda=re.compile('file: \"(.+?)\"').findall(codigo_fonte)
+		stream = ''
+		legenda = ''
+		mensagemprogresso.update(percentagem, "", nome, "")
+		for streamAux in getStream:
+			stream = streamAux
+		for legendaAux in getLegenda:
+			legenda = legendaAux 
+		addVideo(nome, stream, 3, site+imagem, site+legenda)
+		if mensagemprogresso.iscanceled():
+			break
+		i+=1
+		
+	if pagina==0:
+		match_prox=re.compile('<a href=\"(.+?)\" class=\"r\">Pr').findall(codigo_fonte_listaFilmes)
+		pagina+=1
+		for proximo in match_prox:
+			proximo = proximo[1:]
+			addDir('Proximo >>', site+proximo, 1, artfolder+'proximo.png', pagina)
+		
+	elif pagina>=1:
+		match_prox_ant=re.compile('<a href=\".+?\" class="l"><i class="fa fa-arrow-left"></i> Anterior</a><a href="(.+?)" class="r">Pr').findall(codigo_fonte_listaFilmes)
+		pagina+=1
+		for proximo in match_prox_ant:
+			proximo = proximo[1:]
+			addDir('Proximo >>', site+proximo, 1, artfolder+'proximo.png', pagina)
+	
+	mensagemprogresso.close()
+	xbmc.executebuiltin("Container.SetViewMode(500)")
+
+def getSeries(url, pagina):
+	codigo_fonte_listaSeries = abrir_url(url+'series')
+	match_series=re.compile('<li>\n<a href="(.+?)">\n<div class="thumb">\n<div class="img" style="background-image: url\(\'(.+?)\'\);"></div>\n</div>\n<div class="info">\n<div class="title">(.+?)</div>\n<div class="infos">\n<div class="year">(.+?)</div>\n<div class="imdb">(.+?)</div>\n</div>\n</div>\n</a>\n</li>\n').findall(codigo_fonte_listaSeries)
+	for link,imagem,nome,ano,imdb in match_series:
+		link = link[1:]
+		addDir(nome, site+link, 4, site+imagem, pagina)
+
+	if pagina==0:
+		match_prox=re.compile('<a href=\"(.+?)\" class=\"r\">Pr').findall(codigo_fonte_listaSeries)
+		pagina+=1
+		for proximo in match_prox:
+			proximo = proximo[1:]
+			addDir('Proximo >>', site+proximo, 2, artfolder+'proximo.png', pagina)
+		
+	elif pagina>=1:
+		match_prox_ant=re.compile('<a href=\".+?\" class="l"><i class="fa fa-arrow-left"></i> Anterior</a><a href="(.+?)" class="r">Pr').findall(codigo_fonte_listaSeries)
+		pagina+=1
+		for proximo in match_prox_ant:
+			proximo = proximo[1:]
+			addDir('Proximo >>', site+proximo, 2, artfolder+'proximo.png', pagina)
+
+	xbmc.executebuiltin("Container.SetViewMode(500)")
+
+def getSeasons(url):
+	codigo_fonte = abrir_url(url)
+	temporadaN = 0
+	soup = BeautifulSoup(codigo_fonte)
+	
+	for temporada in soup.findAll('h2'):
+		addDirSeason(temporada.text, url, 5, artfolder+'/temporadas/temporada'+str(temporadaN+1)+'.png', 0, temporadaN)
+		temporadaN+=1
+
+	xbmc.executebuiltin("Container.SetViewMode(500)")
+
+
+def getEpisodes(url, temporadaNumero):
+	codigo_fonte = abrir_url(url)
+	soup = BeautifulSoup(codigo_fonte)
+
+	temporadas = soup.findAll('div', attrs={'class':'temporadas'})
+
+	#for temporada in temporadas:
+	match_episodios=re.compile('<li>\n<a href="(.+?)">\n<div class="thumb">\n<div class="img" style="background-image: url\(\'(.+?)\'\);"></div>\n</div>\n<div class="info">\n<div class="title">(.+?)</div>\n<div class="infos">\n<div class="year">(.+?)</div>\n<div class="imdb">(.+?)</div>\n</div>\n</div>\n</a>\n</li>\n').findall(str(temporadas[temporadaNumero]))
+	for link,imagem,nome,ano,imdb in match_episodios:
+		codigo_fonte=abrir_url(site+link)
 		getStream=re.compile('file: \'(.+?)\'').findall(codigo_fonte) 
 		getLegenda=re.compile('file: \"(.+?)\"').findall(codigo_fonte)
 		stream = ''
@@ -32,40 +121,9 @@ def getFilmes(url, pagina):
 		for legendaAux in getLegenda:
 			legenda = legendaAux 
 		addVideo(nome, stream, 3, site+imagem, site+legenda)
-		
-	if pagina==0:
-		match_prox=re.compile('<a href=\"(.+?)\" class=\"r\">Pr').findall(codigo_fonte_listaFilmes)
-		pagina+=1
-		for proximo in match_prox:
-			proximo = proximo[1:]
-			addDir('Proximo >>', site+proximo, 1, '', pagina)
-		
-	elif pagina>=1:
-		match_prox_ant=re.compile('<a href=\".+?\" class="l"><i class="fa fa-arrow-left"></i> Anterior</a><a href="(.+?)" class="r">Pr').findall(codigo_fonte_listaFilmes)
-		print match_prox_ant
-		pagina+=1
-		for proximo in match_prox_ant:
-			proximo = proximo[1:]
-			print "PROXIMO: "+site+proximo
-			addDir('Proximo >>', site+proximo, 1, '', pagina)
-		
 
-def getSeries(url, pagina):
-	codigo_fonte_listaSeries = abrir_url(url+'series')
-	match_series=re.compile('<li>\n<a href="(.+?)">\n<div class="thumb">\n<div class="img" style="background-image: url\(\'(.+?)\'\);"></div>\n</div>\n<div class="info">\n<div class="title">(.+?)</div>\n<div class="infos">\n<div class="year">(.+?)</div>\n<div class="imdb">(.+?)</div>\n</div>\n</div>\n</a>\n</li>\n').findall(codigo_fonte_listaSeries)
-	for link,imagem,nome,ano,imdb in match_series:
-		link = link[1:]
-		print imagem
-		print url+imagem
-		addDir(nome, site+link, 3, site+imagem)
+	xbmc.executebuiltin("Container.SetViewMode(500)")
 
-	match=re.compile('<a href="(.+?)" class="r">Pr').findall(codigo_fonte_listaSeries)
-	for proximo in match:
-		proximo = proximo[1:]
-		addDir('Proximo >>', url+proximo, 1, 0)
-
-def getSeasons(url):
-	return True
 
 
 ###################################################################################
@@ -102,6 +160,14 @@ def addFolder(name,url,mode,iconimage,folder):
 	liz=xbmcgui.ListItem(name, iconImage="fanart.jpg", thumbnailImage=iconimage)
 	liz.setProperty('fanart_image', iconimage)
 	ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=folder)
+	return ok
+
+def addDirSeason(name,url,mode,iconimage,pagina,temporada):
+	u=sys.argv[0]+"?url="+urllib.quote_plus(url)+"&pagina="+str(pagina)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&temporada="+str(temporada)
+	ok=True
+	liz=xbmcgui.ListItem(name, iconImage="fanart.jpg", thumbnailImage=iconimage)
+	liz.setProperty('fanart_image', iconimage)
+	ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=True)
 	return ok
 
 def addVideo(name,url,mode,iconimage,legenda):
@@ -161,6 +227,7 @@ iconimage=None
 link=None
 legenda=None
 pagina=None
+temporada=None
 
 
 try:
@@ -177,6 +244,10 @@ except:
 	pass
 try:
 	name=urllib.unquote_plus(params["name"])
+except:
+	pass
+try:
+	temporada=int(params["temporada"])
 except:
 	pass
 try:
@@ -210,5 +281,6 @@ elif mode==1: getFilmes(url, pagina)
 elif mode==2: getSeries(url, pagina)
 elif mode==3: player(name, url, iconimage, legenda)
 elif mode==4: getSeasons(url)
+elif mode==5: getEpisodes(url, temporada)
 
 xbmcplugin.endOfDirectory(int(sys.argv[1]))

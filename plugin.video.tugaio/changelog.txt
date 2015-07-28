@@ -1,2 +1,6 @@
+v0.0.2
+- Permite ver filmes e séries
+- Divide os episódios das séries por temporadas
+
 v0.0.1
 - Primeira Versão
