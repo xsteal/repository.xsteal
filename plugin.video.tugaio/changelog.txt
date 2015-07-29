@@ -1,3 +1,7 @@
+v0.0.3
+- Secção KIDS
+- Funcionalidade de Pesquisa
+
 v0.0.2
 - Permite ver filmes e séries
 - Divide os episódios das séries por temporadas
