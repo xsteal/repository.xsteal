@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <settings>
     <category label="Definições Gerais">
-      <settigns label="Definições Gerais" />
+		<setting id="pref_site" type="select" label="Site Predefinido" values="Geral|Kids|Ambos" default="Ambos" />
     </category>
 </settings>
