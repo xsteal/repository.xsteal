@@ -11,13 +11,16 @@ fanart = addonfolder + 'fundo.png'
 versao = '0.0.2'
 
 site = 'http://tuga.io/'
+sitekids = 'http://kids.tuga.io/'
 
 def categorias():
 	addDir('Filmes', site, 1, artfolder+'filmes.png', 0)
 	addDir('Series', site, 2, artfolder+'series.png', 0)
+	addDir('Kids', sitekids, 1, artfolder+'filmes.png', 0)	
 	addDir('', '', '', artfolder+'nada.png', 0)
 
 def getFilmes(url, pagina):
+	if 'kids.' in url: site = sitekids
 	mensagemprogresso = xbmcgui.DialogProgress()
 	mensagemprogresso.create('Tuga.io', 'A abrir lista de filmes','Por favor aguarde...')
 	
