@@ -1,3 +1,8 @@
+v0.0.4
+- Download Filmes ou Serie com legendas
+- Definir Vistas nas Configurações do Addon
+- Definir secção Kids ou Normal ou até mesmo Ambos na Configuração do Menu - Manfarricos
+
 v0.0.3
 - Secção KIDS
 - Funcionalidade de Pesquisa

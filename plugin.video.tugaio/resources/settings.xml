@@ -3,4 +3,15 @@
     <category label="Definições Gerais">
 		<setting id="pref_site" type="select" label="Site Predefinido" values="Geral|Kids|Ambos" default="Ambos" />
     </category>
+    <category label="Download">
+    	<setting label="Pasta para download:" type="lsep" />
+    	<setting label="" type="folder" id="pastaDownloads" source="auto" option="writeable" default="Escolha a pasta para Download" enable="!eq(-2,false)"/>
+    </category>
+    <category label="Tipos de vista">
+      <setting label="Definições de vista:" type="lsep" />
+     <setting id="menuView" type="enum" label="Vista de Menu" values="Lista|Lista Grande" default="0"/>
+     <setting id="filmesSeriesView" type="enum" label="Vista de Filmes e Séries" values="Lista|Lista Grande|Miniatura|Posters|Fanart|Media Info 1|Media Info 2|Media Info 3" default="7"/>
+     <setting id="temporadasView" type="enum" label="Vista de temporadas" values="Lista|Lista Grande|Miniatura" default="2"/>
+     <setting id="episodiosView" type="enum" label="Vista de episodios" values="Lista|Lista Grande|Miniatura" default="2"/>
+   </category>
 </settings>
