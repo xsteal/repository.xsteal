@@ -1,7 +1,12 @@
+v0.0.5
+- Escolha de Filmes e Series por Genero
+- Escolha de Filmes e Series por rating IMDB
+- Metadados nos Filmes e Series
+
 v0.0.4
 - Download Filmes ou Serie com legendas
 - Definir Vistas nas Configurações do Addon
-- Definir secção Kids ou Normal ou até mesmo Ambos na Configuração do Menu - Manfarricos
+- Definir secção Kids ou Normal ou até mesmo Ambos na Configuração do Menu - Mafarricos
 
 v0.0.3
 - Secção KIDS
