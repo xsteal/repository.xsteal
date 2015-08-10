@@ -14,9 +14,13 @@ from bs4 import BeautifulSoup
  
 class MovieDB:
 
+	linkImagem = 'http://image.tmdb.org/t/p/original'
+	generos = {}
+
 	def __init__(self, api_key, lingua):
 		self.api_key = api_key
 		self.lingua = lingua
+		self.getGeneros()
 
 	def abrir_url(self, url):
 		req = urllib2.Request(url)
@@ -26,43 +30,30 @@ class MovieDB:
 		response.close()
 		return link
 
-	def getCurrentServerTime(self):
-		url = self.abrir_url('http://thetvdb.com/api/Updates.php?type=none')
-		soup = BeautifulSoup(url)
-		self.previoustime = soup.time
-		return self.previoustime
+	def getGeneros(self):
+		url = self.abrir_url('http://api.themoviedb.org/3/genre/movie/list?api_key='+self.api_key)
+		soup = json.loads(url)
 
-	def getSerieInfo(self, idIMDb):
+		
 
-		url = self.abrir_url('http://www.thetvdb.com/api/GetSeriesByRemoteID.php?imdbid='+idIMDb+'&language='+self.lingua)
-		soup = BeautifulSoup(url)
+		for genero in soup["genres"].keys():
+			self.generos[genero["id"]] = genero["name"]
+
+		print "GENEROS NOVOS ==========================>"
+		print self.generos
+
+	def getMovieInfo(self, idIMDb):
+
+		url = self.abrir_url('https://api.themoviedb.org/3/find/'+idIMDb+'?external_source=imdb_id&language='+self.lingua+'&api_key='+self.api_key)
+		soup = json.loads(url)
+
+		print soup
 
 		data = {}
-		data["serieId"] = soup.seriesid.text
-		data["poster"] = 'http://thetvdb.com/banners/'+soup.banner.text
-		data["aired"] = soup.firstaired.text
-		data["plot"] = soup.overview.text
+		data["name"] = soup["movie_results"]["original_title"]
+		data["poster"] = self.linkImagem+soup["movie_results"]["poster_path"]
+		data["genre"] = soup.firstaired.text
+		data["plot"] = soup["movie_results"]["overview"]
 		return json.dumps(data)
 
-	def getSerieId(self, idIMDb):
-		url = self.abrir_url('http://www.thetvdb.com/api/GetSeriesByRemoteID.php?imdbid='+idIMDb+'&language='+self.lingua)
-		soup = BeautifulSoup(url)
-		return soup.seriesid.text
-
-
-	def getSeasonEpisodio(self, idIMDb, season, episodio):
-		serieId = self.getSerieId(idIMDb)
-		url = self.abrir_url('http://thetvdb.com/api/'+self.api_key+'/series/'+str(serieId)+'/default/'+str(season)+'/'+str(episodio)+'/'+self.lingua+'.xml')
-		soup = BeautifulSoup(url)
-
-		data = {}
-		data['name'] = soup.episodename.text
-		data['plot'] = soup.overview.text
-		data['actors'] = soup.gueststars.text
-		data['aired'] = soup.firstaired.text
-		data['director'] = soup.director.text
-		data['writer'] = soup.writer.text
-		data['poster'] = 'http://thetvdb.com/banners/'+soup.filename.text
-		json_data = json.dumps(data)
-
-		return json_data
+	

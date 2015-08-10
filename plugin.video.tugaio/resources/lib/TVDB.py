@@ -63,6 +63,8 @@ class TVDB:
 		data['director'] = soup.director.text
 		data['writer'] = soup.writer.text
 		data['poster'] = 'http://thetvdb.com/banners/'+soup.filename.text
+		data['season'] = season
+		data['episode'] = episodio
 		json_data = json.dumps(data)
 
 		return json_data

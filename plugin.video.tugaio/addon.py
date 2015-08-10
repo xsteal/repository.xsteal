@@ -1,12 +1,13 @@
 #!/usr/bin/python
-#Agredecimentos ao Manfarricos
+# -*- coding: utf-8 -*-
 
+#Agredecimentos ao Manfarricos
 
 import urllib,urllib2,re,xbmcplugin,xbmcgui,xbmcaddon,xbmc,os,json,threading
 from bs4 import BeautifulSoup
 from resources.lib import Downloader #Enen92 class
 from resources.lib import TVDB
-#from resourses.lib import MovieDB
+from resources.lib import MovieDB
 
 
 addon_id    = xbmcaddon.Addon().getAddonInfo("id")
@@ -21,7 +22,7 @@ pastaSeries = xbmc.translatePath(selfAddon.getSetting('bibliotecaSeries'))
 
 
 tv = TVDB.TVDB('D2E52B80062E3EE0', 'pt')
-#movie = MovieDB.MovieDB('3421e679385f33e2438463e286e5c918')
+#movie = MovieDB.MovieDB('3421e679385f33e2438463e286e5c918', 'pt')
 
 site = 'http://tuga.io/'
 sitekids = 'http://kids.tuga.io/'
@@ -32,24 +33,28 @@ def getLiguaMetaDados():
 	if lingua == '0': lang = 'pt'
 	elif lingua == '1': lang = 'en'
 
+	print "LINGUA: ========>"
+	print lang
+
+
 	return lang
 
 def categorias():
 	if getSetting("pref_site") == 'Geral' or getSetting("pref_site") == 'Ambos':
-		addDir('Filmes', site+'filmes', 1, os.path.join(artfolder,'filmes.png'), 0)
-		addDir('Series', site+'series', 2, os.path.join(artfolder,'series.png'), 0)
-		addDir('Pesquisa', site, 6, os.path.join(artfolder,'pesquisa.png'), 0)
+		addDir('Filmes', site+'filmes', 1, os.path.join(artfolder,'novo','filmes.png'), 0)
+		addDir('Series', site+'series', 2, os.path.join(artfolder,'novo','series.png'), 0)
+		addDir('Pesquisa', site, 6, os.path.join(artfolder,'novo','pesquisa.png'), 0)
 		if "confluence" in xbmc.getSkinDir(): addDir('', '', '', os.path.join(artfolder,'nada.png'), 0)
 	if getSetting("pref_site") == 'Kids' or getSetting("pref_site") == 'Ambos':
-		addDir('Filmes KIDS', sitekids+'filmes', 1, os.path.join(artfolder,'filmes_kids.png'), 0)
-		addDir('Pesquisa KIDS', sitekids, 6, os.path.join(artfolder,'pesquisa_kids.png'), 0)
-	if "confluence" in xbmc.getSkinDir(): addDir('', '', '', os.path.join(artfolder,'nada.png'), 0)
-	addDir('Filmes por Genero', site, 8, os.path.join(artfolder,'filmes.png'), 0)
-	addDir('Series por Genero', site, 9, os.path.join(artfolder,'series.png'), 0)
-	addDir('Filmes IMDB Rating', site+'filmes?orderby=1', 1, os.path.join(artfolder,'filmes.png'), 0)
-	addDir('Series IMDB Rating', site+'series?orderby=1', 2, os.path.join(artfolder,'series.png'), 0)
-	if "confluence" in xbmc.getSkinDir(): addDir('', '', '', os.path.join(artfolder,'nada.png'), 0)
-	addDir('Definicoes', site, 1000, os.path.join(artfolder,'nanda.png'), 0)
+		addDir('Filmes KIDS', sitekids+'filmes', 1, os.path.join(artfolder,'novo','kids.png'), 0)
+		addDir('Pesquisa KIDS', sitekids, 6, os.path.join(artfolder,'novo','pesquisa.png'), 0)
+		if "confluence" in xbmc.getSkinDir(): addDir('', '', '', os.path.join(artfolder,'nada.png'), 0)
+	addDir('Filmes por Genero', site, 8, os.path.join(artfolder,'novo','generos.png'), 0)
+	addDir('Series por Genero', site, 9, os.path.join(artfolder,'novo','generos.png'), 0)
+	addDir('Filmes IMDB Rating', site+'filmes?orderby=1', 1, os.path.join(artfolder,'novo','imdb.png'), 0)
+	addDir('Series IMDB Rating', site+'series?orderby=1', 2, os.path.join(artfolder,'novo','imdb.png'), 0)
+	if "confluence" in xbmc.getSkinDir(): addDir('', '', '', os.path.join(artfolder,'novo','nada.png'), 0)
+	addDir('Definicoes', site, 1000, os.path.join(artfolder,'novo','definicoes.png'), 0)
 	#setVista('menu')
 	vista_menu()
 
@@ -74,10 +79,10 @@ def getFilmes(url, pagina):
 	for link,imagem,nome,ano,imdb in match_filmes:
 		percentagem = int((i/tamanhoArray)*100)
 		link = link[1:]
-		codigo_fonte=abrir_url(siteAux+link)
+		
 		
 		idIMDb = link.split('/')[-1]
-
+		
 		mediaInfo = getInfoIMDB(idIMDb)
 		nome = mediaInfo['Title'].encode('utf8')
 		ano = mediaInfo['Year'].encode('utf8')
@@ -85,14 +90,8 @@ def getFilmes(url, pagina):
 		poster = mediaInfo['Poster']
 		
 		#match=re.compile('jwplayer\(\'player_get_hard\'\).setup\(\{\n                            file: \'(.+?)\',\n                            aspectratio: \'.+?\',\n                            width: \'.+?\',\n                            height: \'.+?\',\n                            skin: \'.+?\',\n                            primary: ".+?",\n                            androidhls:.+?,\n                            logo : \{\n                                file: ".+?",\n                                link: ".+?",\n                                hide: .+?\n                            \},\n                            tracks:\n                                    \[\n                                        \{\n                                            file: "(.+?)",\n                                            default: ".+?"\n                                        \}\n                                    \],\n                            captions: \{\n                                backgroundOpacity: .+?                            \}\n\n                        \}\);').findall(codigo_fonte)
-		getStream=re.compile('file: \'(.+?)\'').findall(codigo_fonte) 
-		getLegenda=re.compile('file: \"(.+?)\"').findall(codigo_fonte)
-		stream = ''
-		legenda = ''
 		mensagemprogresso.update(percentagem, "", nome, "")
-		for streamAux in getStream: stream = streamAux
-		for legendaAux in getLegenda: legenda = legendaAux 
-		addVideo(nome + ' ('+ano+')', stream, 3, siteAux+imagem, siteAux+legenda, 'filme', infoLabels, poster)
+		addVideo(nome + ' ('+ano+')', siteAux+link, 3, siteAux+imagem, 'filme', infoLabels, poster)
 		if mensagemprogresso.iscanceled(): break
 		i+=1
 		
@@ -149,7 +148,7 @@ def getSeasons(url):
 	idIMDb = url.split('/')[-1]
 	
 	for temporada in soup.findAll('h2'):
-		addDirSeason(temporada.text, url, 5, os.path.join(artfolder,'temporadas','temporada'+str(temporadaN+1)+'.png'), 0, temporadaN, idIMDb)
+		addDirSeason(temporada.text, url, 5, os.path.join(artfolder,'novo','temporadas','temporada'+str(temporadaN+1)+'.png'), 0, temporadaN, idIMDb)
 		temporadaN+=1
 	#setVista('temporadas')
 	vista_temporadas()
@@ -164,14 +163,12 @@ def getEpisodes(url, temporadaNumero, idIMDb):
 	i = 0
 	match_episodios=re.compile('<li>\n<a href="(.+?)">\n<div class="thumb">\n<div class="img" style="background-image: url\(\'(.+?)\'\);"></div>\n</div>\n<div class="info">\n<div class="title">(.+?)</div>\n<div class="infos">\n<div class="year">(.+?)</div>\n<div class="imdb">(.+?)</div>\n</div>\n</div>\n</a>\n</li>\n').findall(str(temporadas[temporadaNumero]))
 	for link,imagem,nomeOriginal,ano,imdb in match_episodios:
-		codigo_fonte=abrir_url(site+link)
 
 		episodioNumero = nomeOriginal.split('.')[1]
 		episodioNomeSplit = episodioNumero.split('|')
 		episodioNumero = episodioNomeSplit[0]
 		
 		codigoIMDb = link.split('/')[-1]
-		
 		
 		if int(episodioNumero) == 0:
 			i+=1
@@ -180,25 +177,23 @@ def getEpisodes(url, temporadaNumero, idIMDb):
 		mediaInfo = json.loads(tv.getSeasonEpisodio(idIMDb,(temporadaNumero+1),episodioNumero))
 		nome = 'Ep. '+str(episodioNumero)+' - '+mediaInfo['name'].encode('utf8')
 		ano = mediaInfo['aired'].encode('utf8')
-		infoLabels = {'Title':nome, 'Aired': mediaInfo['aired'], 'Actors':mediaInfo['actors'], 'Plot':mediaInfo['plot'], 'Season':temporadaNumero, 'Episode':episodioNumero, 'Writer': mediaInfo['writer'], 'Director':mediaInfo["director"], "Code":codigoIMDb }
+		infoLabels = {'Title':nome, 'Aired': mediaInfo['aired'], 'Actors':mediaInfo['actors'], 'Plot':mediaInfo['plot'], 'Season':mediaInfo['season'], 'Episode':mediaInfo['episode'], 'Writer': mediaInfo['writer'], 'Director':mediaInfo["director"], "Code":codigoIMDb }
 
 		poster = site+imagem
 
-		getStream=re.compile('file: \'(.+?)\'').findall(codigo_fonte) 
-		getLegenda=re.compile('file: \"(.+?)\"').findall(codigo_fonte)
-		stream = ''
-		legenda = ''
-		for streamAux in getStream: stream = streamAux
-		for legendaAux in getLegenda: legenda = legendaAux 
-		addVideo(nome, stream, 3, site+imagem, site+legenda, 'episodio', infoLabels, poster)
+		addVideo(nome, site+link, 3, site+imagem, 'episodio', infoLabels, poster)
 	#setVista('episodios')
 	vista_episodios()
 
 def pesquisa(url):
 	siteAux = ''
 
-	if 'kids.' in url: siteAux = sitekids
-	else: siteAux = site
+	if 'kids.' in url: 
+		siteAux = sitekids
+		artFilmes = os.path.join(artfolder,'novo','kids.png')
+	else: 
+		siteAux = site
+		artFilmes = os.path.join(artfolder,'novo','filmes.png')
 
 	url =  siteAux + 'procurar'
 
@@ -212,12 +207,11 @@ def pesquisa(url):
 		soup = BeautifulSoup(codigo_fonte_pesquisa)
 		filmes_series = soup.findAll('div', attrs={'class':'list'})
 
-		if(filmes_series[0].find('ul').text != ''):
-			addLink('Filmes:', '', artfolder+'filmes.png')
+		if(str(filmes_series[0].find('ul').text) != ''):
+			addLink('Filmes:', '', artFilmes)
 			match_filmes=re.compile('<li>\n<a href="(.+?)">\n<div class="thumb">\n<div class="img" style="background-image: url\(\'(.+?)\'\);"></div>\n</div>\n<div class="info">\n<div class="title">(.+?)</div>\n<div class="infos">\n<div class="year">(.+?)</div>\n<div class="imdb">(.+?)</div>\n</div>\n</div>\n</a>\n</li>\n').findall(str(filmes_series[0]))
 			for link,imagem,nome,ano,imdb in match_filmes:
 				link = link[1:]
-				codigo_fonte=abrir_url(siteAux+link)
 
 				idIMDb = link.split('/')[-1]
 				mediaInfo = getInfoIMDB(idIMDb)
@@ -226,18 +220,12 @@ def pesquisa(url):
 				infoLabels = {'Title':name, 'Year': ano, 'Genre':mediaInfo['Genre'], 'Plot':mediaInfo['Plot']}
 				poster = mediaInfo['Poster']
 				
-				getStream=re.compile('file: \'(.+?)\'').findall(codigo_fonte) 
-				getLegenda=re.compile('file: \"(.+?)\"').findall(codigo_fonte)
-				stream = ''
-				legenda = ''
-				for streamAux in getStream: stream = streamAux
-				for legendaAux in getLegenda: legenda = legendaAux 
-				addVideo(nome + ' ('+ano+')', stream, 3, siteAux+imagem, siteAux+legenda,'filme', infoLabels, poster)
+				addVideo(nome + ' ('+ano+')', siteAux+link, 3, siteAux+imagem,'filme', infoLabels, poster)
 
-		addDir('', '', '', artfolder+'nada.png', 0)
+			addDir('', '', '', os.path.join(artfolder,'novo','nada.png'), 0)
 
-		if(filmes_series[1].find('ul').text != ''):
-			addLink('Series:', '', artfolder+'series.png')
+		if(str(filmes_series[1].find('ul').text) != ''):
+			addLink('Series:', '', os.path.join(artfolder,'novo','series.png'))
 			match_series=re.compile('<li>\n<a href="(.+?)">\n<div class="thumb">\n<div class="img" style="background-image: url\(\'(.+?)\'\);"></div>\n</div>\n<div class="info">\n<div class="title">(.+?)</div>\n<div class="infos">\n<div class="year">(.+?)</div>\n<div class="imdb">(.+?)</div>\n</div>\n</div>\n</a>\n</li>\n').findall(str(filmes_series[1]))
 			for link,imagem,nome,ano,imdb in match_series:
 				link = link[1:]
@@ -252,22 +240,53 @@ def pesquisa(url):
 		#setVista('filmesSeries')
 		vista_filmesSeries()
 
-def download(url,name,legenda):
+def download(url,name):
+
+	legendasOn = False
+
+	dialog = xbmcgui.Dialog()
+	servidor = dialog.select(u'Escolha o servidor para Download', ['Servidor #1', 'Servidor #2', 'Servidor #3'])
+	
+	stream, legenda = getStreamLegenda(url)
+	splitStream = stream.split('/')
+
+	nomeStream = stream.split('/')[-1]
+
+	tamanho = len(splitStream)
+
+	if servidor == 0:
+		stream = 'http://az786600.vo.msecnd.net/'
+		if tamanho == 5:
+			stream += splitStream[3]+'/'
+		stream += nomeStream
+	elif servidor == 1:
+		stream = 'http://cdn3.tuga.io/'
+		if tamanho == 5:
+			stream += splitStream[3]+'/'
+		stream += nomeStream
+	elif servidor == 2:
+		stream = 'http://cdn.tuga.su/'
+		if tamanho == 5:
+			stream += splitStream[3]+'/'
+		stream += nomeStream
+
 	folder = selfAddon.getSetting('pastaDownloads')
 
-	urlAux = clean(url.split('/')[-1])
-	legendaAux = clean(legenda.split('/')[-1])
-
+	urlAux = clean(stream.split('/')[-1])
 	extensaoMedia = clean(urlAux.split('.')[-1])
-	extensaoLegenda = clean(legendaAux.split('.')[1])
-
 	nomeMedia = name+'.'+extensaoMedia
-	nomeLegenda = name+'.'+extensaoLegenda
-
-
-	Downloader.Downloader().download( os.path.join(folder,nomeMedia), url, name)
 	
-	download_legendas(legenda, os.path.join(folder,nomeLegenda))
+
+	if legenda != '':
+		legendaAux = clean(legenda.split('/')[-1])
+		extensaoLegenda = clean(legendaAux.split('.')[1])
+		nomeLegenda = name+'.'+extensaoLegenda
+		legendasOn = True
+
+	Downloader.Downloader().download( os.path.join(folder,nomeMedia), stream, name)
+
+	if legendasOn:
+		download_legendas(legenda, os.path.join(folder,nomeLegenda))
 
 def download_legendas(url,path):
 	contents = abrir_url(url)
@@ -276,6 +295,28 @@ def download_legendas(url,path):
 		fh.write(contents)
 		fh.close()
 	return
+
+def getStreamLegenda(url):
+	siteAux = ''
+	legendasOn = True
+	if 'kids.' in url: 
+		siteAux = sitekids
+		legendasOn = False
+	else: 
+		siteAux = site
+
+	codigo_fonte = abrir_url(url)
+
+	getStream=re.compile('file: \'(.+?)\'').findall(codigo_fonte) 
+	getLegenda=re.compile('file: \"(.+?)\"').findall(codigo_fonte)
+	stream = ''
+	legenda = ''
+		
+	for streamAux in getStream: stream = streamAux
+	if legendasOn:
+		for legendaAux in getLegenda: legenda = siteAux+legendaAux
+
+	return stream, legenda
 
 def getInfoIMDB(idIMDb):
 	url = 'http://www.omdbapi.com/?i='+idIMDb+'&plot=short'
@@ -328,7 +369,7 @@ def addBiblioteca(nome, url, tipo, temporada=False, episodio=False):
 		file_folder = os.path.join(pastaSeries, nome+'/','S'+temporada)
 		title =  nome + ' S'+temporada+'E'+episodio
 
-	strm_contents = 'plugin://plugin.video.tugaio/?url=' + url +'&mode='+1+'&name=' + urllib.quote_plus(nome)
+	strm_contents = 'plugin://plugin.video.tugaio/?url='+url+'&mode=3&name='+urllib.quote_plus(nome)
 	savefile(urllib.quote_plus(title)+'.strm',strm_contents,file_folder)
 	if updatelibrary: xbmc.executebuiltin("XBMC.UpdateLibrary(video)")
 	return True
@@ -367,35 +408,7 @@ def vista_episodios():
 	opcao = selfAddon.getSetting('episodiosView')
 	if opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
 	elif opcao == '1': xbmc.executebuiltin("Container.SetViewMode(51)")
-	elif opcao == '2': xbmc.executebuiltin("Container.SetViewMode(500)")
-
-"""def setVista(vista):
-	if vista == 'menu':
-		opcao = selfAddon.getSetting('menuView')
-		if opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
-		elif opcao == '1': xbmc.executebuiltin("Container.SetViewMode(51)")
-    elif vista == 'filmesSeries':
-    	opcao = selfAddon.getSetting('filmesSeriesView')
-    	if opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
-    	elif opcao == '1': xbmc.executebuiltin("Container.SetViewMode(51)")
-    	elif opcao == '2': xbmc.executebuiltin("Container.SetViewMode(500)")
-    	elif opcao == '3': xbmc.executebuiltin("Container.SetViewMode(501)")
-    	elif opcao == '4': xbmc.executebuiltin("Container.SetViewMode(508)")
-    	elif opcao == '5': xbmc.executebuiltin("Container.SetViewMode(504)")
-    	elif opcao == '6': xbmc.executebuiltin("Container.SetViewMode(503)")
-    	elif opcao == '7': xbmc.executebuiltin("Container.SetViewMode(515)")
-    elif vista == 'temporadas':
-    	opcao = selfAddon.getSetting('temporadasView')
-    	if opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
-    	elif opcao == '1': xbmc.executebuiltin("Container.SetViewMode(51)")
-    	elif opcao == '2': xbmc.executebuiltin("Container.SetViewMode(500)")
-    elif vista == 'episodios':
-    	opcao = selfAddon.getSetting('episodiosView')
-    	if opcao == '0': xbmc.executebuiltin("Container.SetViewMode(50)")
-    	elif opcao == '1': xbmc.executebuiltin("Container.SetViewMode(51)")
-    	elif opcao == '2': xbmc.executebuiltin("Container.SetViewMode(500)")
-"""
-    
+	elif opcao == '2': xbmc.executebuiltin("Container.SetViewMode(500)")    
 
 ###################################################################################
 #                               FUNCOES JA FEITAS                                 #
@@ -476,7 +489,7 @@ def addDirSeason(name,url,mode,iconimage,pagina,temporada,idIMDbSerie,infoLabels
 	ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=True)
 	return ok
 
-def addVideo(name,url,mode,iconimage,legenda,tipo,infoLabels=False,poster=False):
+def addVideo(name,url,mode,iconimage,tipo,infoLabels=False,poster=False):
 	if infoLabels: infoLabelsAux = infoLabels
 	else: infoLabelsAux = {'Title': name}
 
@@ -491,13 +504,13 @@ def addVideo(name,url,mode,iconimage,legenda,tipo,infoLabels=False,poster=False)
 		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
 
 
-	u=sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&legenda="+urllib.quote_plus(legenda)+"&iconimage="+urllib.quote_plus(iconimage)
+	u=sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
 	ok=True
 	contextMenuItems = []
 	liz=xbmcgui.ListItem(name, iconImage=posterAux, thumbnailImage=posterAux)
 	liz.setProperty('fanart_image', posterAux)
 	liz.setInfo( type="Video", infoLabels=infoLabelsAux )
-	contextMenuItems.append(('Download', 'XBMC.RunPlugin(%s?mode=7&name=%s&url=%s&iconimage=%s&legenda=%s)'%(sys.argv[0],urllib.quote_plus(name), urllib.quote_plus(url), urllib.quote_plus(iconimage), urllib.quote_plus(legenda))))
+	contextMenuItems.append(('Download', 'XBMC.RunPlugin(%s?mode=7&name=%s&url=%s&iconimage=%s)'%(sys.argv[0],urllib.quote_plus(name), urllib.quote_plus(url), urllib.quote_plus(iconimage))))
 	liz.addContextMenuItems(contextMenuItems, replaceItems=False)
 	ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=False)
 	return ok
@@ -507,15 +520,49 @@ def clean(text):
 	regex = re.compile("|".join(map(re.escape, command.keys())))
 	return regex.sub(lambda mo: command[mo.group(0)], text)
 
-def player(name,url,iconimage,legenda):
+def player(name,url,iconimage):
+
+	mensagemprogresso = xbmcgui.DialogProgress()
+	dialog = xbmcgui.Dialog()
+	servidor = dialog.select(u'Escolha o servidor', ['Servidor #1', 'Servidor #2', 'Servidor #3'])
+
+	stream, legenda = getStreamLegenda(url)
+
+	splitStream = stream.split('/')
+
+	nomeStream = stream.split('/')[-1]
+
+	tamanho = len(splitStream)
+
+	if servidor == 0:
+		stream = 'http://az786600.vo.msecnd.net/'
+		if tamanho == 5:
+			stream += splitStream[3]+'/'
+		stream += nomeStream
+	elif servidor == 1:
+		stream = 'http://cdn3.tuga.io/'
+		if tamanho == 5:
+			stream += splitStream[3]+'/'
+		stream += nomeStream
+	elif servidor == 2:
+		stream = 'http://cdn.tuga.su/'
+		if tamanho == 5:
+			stream += splitStream[3]+'/'
+		stream += nomeStream
+
+	mensagemprogresso.create('Tuga.io', u'Abrir emissão','Por favor aguarde...')
+
 	playlist = xbmc.PlayList(1)
 	playlist.clear()
 	listitem = xbmcgui.ListItem(name, iconImage="DefaultVideo.png", thumbnailImage=iconimage)
 	listitem.setInfo("Video", {"title":name})
 	listitem.setProperty('mimetype', 'video/x-msvideo')
 	listitem.setProperty('IsPlayable', 'true')
-	playlist.add(url, listitem)
+	
+	playlist.add(stream, listitem)
+	mensagemprogresso.update(50, "", u'Boa Sessão!!!', "")
 	xbmcPlayer = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
+	mensagemprogresso.close()
 	xbmcPlayer.play(playlist)
 	xbmc.Player().setSubtitles(legenda)
 
@@ -581,11 +628,11 @@ print "PAGINA: "+str(pagina)
 if mode==None or url==None or len(url)<1: categorias()
 elif mode==1: getFilmes(url, pagina)
 elif mode==2: getSeries(url, pagina)
-elif mode==3: player(name, url, iconimage, legenda)
+elif mode==3: player(name, url, iconimage)
 elif mode==4: getSeasons(url)
 elif mode==5: getEpisodes(url, temporada, idIMDbSerie)
 elif mode==6: pesquisa(url)
-elif mode==7: download(url, name, legenda)
+elif mode==7: download(url, name)
 elif mode==8: getGeneros(url, 'filmes')
 elif mode==9: getGeneros(url, 'series')
 elif mode==1000: abrirDefinincoes()
