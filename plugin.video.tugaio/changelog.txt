@@ -1,3 +1,8 @@
+v0.0.7
+- Re-branding, obrigado johnny88
+- Correção de API de filmes, desativado de momento! 
+
+
 v0.0.6
 - Re-branding, obrigado johnny88
 - Escolha de servidor no inicio da sessão

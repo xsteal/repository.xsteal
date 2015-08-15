@@ -20,6 +20,7 @@ fanart 		= os.path.join(addonfolder,'fundo.png')
 pastaFilmes = xbmc.translatePath(selfAddon.getSetting('bibliotecaFilmes'))
 pastaSeries = xbmc.translatePath(selfAddon.getSetting('bibliotecaSeries'))
 
+skin = 'v2'
 
 tv = TVDB.TVDB('D2E52B80062E3EE0', 'pt')
 #movie = MovieDB.MovieDB('3421e679385f33e2438463e286e5c918', 'pt')
@@ -41,20 +42,20 @@ def getLiguaMetaDados():
 
 def categorias():
 	if getSetting("pref_site") == 'Geral' or getSetting("pref_site") == 'Ambos':
-		addDir('Filmes', site+'filmes', 1, os.path.join(artfolder,'novo','filmes.png'), 0)
-		addDir('Series', site+'series', 2, os.path.join(artfolder,'novo','series.png'), 0)
-		addDir('Pesquisa', site, 6, os.path.join(artfolder,'novo','pesquisa.png'), 0)
+		addDir('Filmes', site+'filmes', 1, os.path.join(artfolder,skin,'filmes.png'), 0)
+		addDir('Series', site+'series', 2, os.path.join(artfolder,skin,'series.png'), 0)
+		addDir('Pesquisa', site, 6, os.path.join(artfolder,skin,'pesquisa.png'), 0)
 		if "confluence" in xbmc.getSkinDir(): addDir('', '', '', os.path.join(artfolder,'nada.png'), 0)
 	if getSetting("pref_site") == 'Kids' or getSetting("pref_site") == 'Ambos':
-		addDir('Filmes KIDS', sitekids+'filmes', 1, os.path.join(artfolder,'novo','kids.png'), 0)
-		addDir('Pesquisa KIDS', sitekids, 6, os.path.join(artfolder,'novo','pesquisa.png'), 0)
+		addDir('Filmes KIDS', sitekids+'filmes', 1, os.path.join(artfolder,skin,'kids.png'), 0)
+		addDir('Pesquisa KIDS', sitekids, 6, os.path.join(artfolder,skin,'pesquisakids.png'), 0)
 		if "confluence" in xbmc.getSkinDir(): addDir('', '', '', os.path.join(artfolder,'nada.png'), 0)
-	addDir('Filmes por Genero', site, 8, os.path.join(artfolder,'novo','generos.png'), 0)
-	addDir('Series por Genero', site, 9, os.path.join(artfolder,'novo','generos.png'), 0)
-	addDir('Filmes IMDB Rating', site+'filmes?orderby=1', 1, os.path.join(artfolder,'novo','imdb.png'), 0)
-	addDir('Series IMDB Rating', site+'series?orderby=1', 2, os.path.join(artfolder,'novo','imdb.png'), 0)
-	if "confluence" in xbmc.getSkinDir(): addDir('', '', '', os.path.join(artfolder,'novo','nada.png'), 0)
-	addDir('Definicoes', site, 1000, os.path.join(artfolder,'novo','definicoes.png'), 0)
+	addDir('Filmes por Genero', site, 8, os.path.join(artfolder,skin,'filmegeneros.png'), 0)
+	addDir('Series por Genero', site, 9, os.path.join(artfolder,skin,'seriesgeneros.png'), 0)
+	addDir('Filmes IMDB Rating', site+'filmes?orderby=1', 1, os.path.join(artfolder,skin,'filmesimdb.png'), 0)
+	addDir('Series IMDB Rating', site+'series?orderby=1', 2, os.path.join(artfolder,skin,'seriesimdb.png'), 0)
+	if "confluence" in xbmc.getSkinDir(): addDir('', '', '', os.path.join(artfolder,skin,'nada.png'), 0)
+	addDir('Definicoes', site, 1000, os.path.join(artfolder,skin,'definicoes.png'), 0)
 	#setVista('menu')
 	vista_menu()
 
@@ -83,12 +84,15 @@ def getFilmes(url, pagina):
 		
 		idIMDb = link.split('/')[-1]
 		
-		mediaInfo = getInfoIMDB(idIMDb)
+		"""mediaInfo = getInfoIMDB(idIMDb)
 		nome = mediaInfo['Title'].encode('utf8')
 		ano = mediaInfo['Year'].encode('utf8')
 		infoLabels = {'Title':name, 'Year': ano, 'Genre':mediaInfo['Genre'], 'Plot':mediaInfo['Plot']}
 		poster = mediaInfo['Poster']
-		
+		"""
+
+		infoLabels = {'Title': name, 'Year': ano}
+		poster = site+imagem
 		#match=re.compile('jwplayer\(\'player_get_hard\'\).setup\(\{\n                            file: \'(.+?)\',\n                            aspectratio: \'.+?\',\n                            width: \'.+?\',\n                            height: \'.+?\',\n                            skin: \'.+?\',\n                            primary: ".+?",\n                            androidhls:.+?,\n                            logo : \{\n                                file: ".+?",\n                                link: ".+?",\n                                hide: .+?\n                            \},\n                            tracks:\n                                    \[\n                                        \{\n                                            file: "(.+?)",\n                                            default: ".+?"\n                                        \}\n                                    \],\n                            captions: \{\n                                backgroundOpacity: .+?                            \}\n\n                        \}\);').findall(codigo_fonte)
 		mensagemprogresso.update(percentagem, "", nome, "")
 		addVideo(nome + ' ('+ano+')', siteAux+link, 3, siteAux+imagem, 'filme', infoLabels, poster)
@@ -100,14 +104,14 @@ def getFilmes(url, pagina):
 		pagina+=1
 		for proximo in match_prox:
 			proximo = proximo[1:]
-			addDir('Proximo >>', siteAux+proximo, 1, os.path.join(artfolder,'proximo.png'), pagina)
+			addDir('Proximo >>', siteAux+proximo, 1, os.path.join(artfolder,skin,'proximo.png'), pagina)
 		
 	elif pagina>=1:
 		match_prox_ant=re.compile('<a href=\".+?\" class="l"><i class="fa fa-arrow-left"></i> Anterior</a><a href="(.+?)" class="r">Pr').findall(codigo_fonte_listaFilmes)
 		pagina+=1
 		for proximo in match_prox_ant:
 			proximo = proximo[1:]
-			addDir('Proximo >>', siteAux+proximo, 1, os.path.join(artfolder,'proximo.png'), pagina)
+			addDir('Proximo >>', siteAux+proximo, 1, os.path.join(artfolder,skin,'proximo.png'), pagina)
 	
 	mensagemprogresso.close()
 	#setVista('filmesSeries')
@@ -131,13 +135,13 @@ def getSeries(url, pagina):
 		pagina+=1
 		for proximo in match_prox:
 			proximo = proximo[1:]
-			addDir('Proximo >>', site+proximo, 2, artfolder+'proximo.png', pagina)	
+			addDir('Proximo >>', site+proximo, 2, os.path.join(artfolder,skin,'proximo.png'), pagina)	
 	elif pagina>=1:
 		match_prox_ant=re.compile('<a href=\".+?\" class="l"><i class="fa fa-arrow-left"></i> Anterior</a><a href="(.+?)" class="r">Pr').findall(codigo_fonte_listaSeries)
 		pagina+=1
 		for proximo in match_prox_ant:
 			proximo = proximo[1:]
-			addDir('Proximo >>', site+proximo, 2, os.path.join(artfolder,'proximo.png'), pagina)
+			addDir('Proximo >>', site+proximo, 2, os.path.join(artfolder,skin,'proximo.png'), pagina)
 	#setVista('filmesSeries')
 	vista_filmesSeries()
 
@@ -148,7 +152,7 @@ def getSeasons(url):
 	idIMDb = url.split('/')[-1]
 	
 	for temporada in soup.findAll('h2'):
-		addDirSeason(temporada.text, url, 5, os.path.join(artfolder,'novo','temporadas','temporada'+str(temporadaN+1)+'.png'), 0, temporadaN, idIMDb)
+		addDirSeason(temporada.text, url, 5, os.path.join(artfolder,skin,'temporadas','temporada'+str(temporadaN+1)+'.png'), 0, temporadaN, idIMDb)
 		temporadaN+=1
 	#setVista('temporadas')
 	vista_temporadas()
@@ -190,10 +194,10 @@ def pesquisa(url):
 
 	if 'kids.' in url: 
 		siteAux = sitekids
-		artFilmes = os.path.join(artfolder,'novo','kids.png')
+		artFilmes = os.path.join(artfolder,skin,'kids.png')
 	else: 
 		siteAux = site
-		artFilmes = os.path.join(artfolder,'novo','filmes.png')
+		artFilmes = os.path.join(artfolder,skin,'filmes.png')
 
 	url =  siteAux + 'procurar'
 
@@ -214,18 +218,22 @@ def pesquisa(url):
 				link = link[1:]
 
 				idIMDb = link.split('/')[-1]
-				mediaInfo = getInfoIMDB(idIMDb)
+				"""mediaInfo = getInfoIMDB(idIMDb)
 				nome = mediaInfo['Title'].encode('utf8')
 				ano = mediaInfo['Year'].encode('utf8')
 				infoLabels = {'Title':name, 'Year': ano, 'Genre':mediaInfo['Genre'], 'Plot':mediaInfo['Plot']}
 				poster = mediaInfo['Poster']
+				"""
+
+				infoLabels = {'Title': name, 'Year': ano}
+				poster = site+imagem
 				
 				addVideo(nome + ' ('+ano+')', siteAux+link, 3, siteAux+imagem,'filme', infoLabels, poster)
 
 			addDir('', '', '', os.path.join(artfolder,'novo','nada.png'), 0)
 
 		if(str(filmes_series[1].find('ul').text) != ''):
-			addLink('Series:', '', os.path.join(artfolder,'novo','series.png'))
+			addLink('Series:', '', os.path.join(artfolder,skin,'series.png'))
 			match_series=re.compile('<li>\n<a href="(.+?)">\n<div class="thumb">\n<div class="img" style="background-image: url\(\'(.+?)\'\);"></div>\n</div>\n<div class="info">\n<div class="title">(.+?)</div>\n<div class="infos">\n<div class="year">(.+?)</div>\n<div class="imdb">(.+?)</div>\n</div>\n</div>\n</a>\n</li>\n').findall(str(filmes_series[1]))
 			for link,imagem,nome,ano,imdb in match_series:
 				link = link[1:]
@@ -331,11 +339,11 @@ def getGeneros(url, tipo):
 	if tipo == 'filmes':
 		siteAux = url+'filmes'
 		mode = 1
-		arte = os.path.join(artfolder,'filmes.png')
+		arte = os.path.join(artfolder,skin,'filmes.png')
 	elif tipo == 'series':
 		siteAux = url+'series'
 		mode = 2
-		arte = os.path.join(artfolder,'series.png')
+		arte = os.path.join(artfolder,skin,'series.png')
 
 
 	codigo_fonte=abrir_url(siteAux)
@@ -377,7 +385,7 @@ def addBiblioteca(nome, url, tipo, temporada=False, episodio=False):
 
 def abrirDefinincoes():
 	selfAddon.openSettings()
-	addDir('Entrar novamente','url',None,artfolder+'refresh.jpg',True)
+	addDir('Entrar novamente','url',None,os.path.join(artfolder,skin,'retroceder.png'),True)
 	vista_menu()
 	xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
