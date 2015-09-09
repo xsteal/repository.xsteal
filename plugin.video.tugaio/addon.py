@@ -126,9 +126,10 @@ def getSeries(url, pagina):
 		
 		idIMDb = link.split('/')[-1]
 		
-		mediaInfo = json.loads(tv.getSerieInfo(idIMDb))
+		#mediaInfo = json.loads(tv.getSerieInfo(idIMDb))
 
-		infoLabels = {'Title':nome, 'Aired':mediaInfo['aired'], 'Plot':mediaInfo['plot']}
+		#infoLabels = {'Title':nome, 'Aired':mediaInfo['aired'], 'Plot':mediaInfo['plot']}
+		infoLabels = {'Title':nome}
 		addDir(nome+ ' ('+ano+')', site+link, 4, site+imagem, pagina, 'serie', infoLabels, site+imagem)
 
 	if pagina==0:
@@ -149,7 +150,10 @@ def getSeries(url, pagina):
 def getSeasons(url):
 	codigo_fonte = abrir_url(url)
 	temporadaN = 0
-	soup = BeautifulSoup(codigo_fonte)
+	
+	match = re.compile('(?s)(.*)\n<footer').findall(codigo_fonte)
+
+	soup = BeautifulSoup(match[0])
 	idIMDb = url.split('/')[-1]
 	
 	for temporada in soup.findAll('h2'):
@@ -161,8 +165,12 @@ def getSeasons(url):
 
 def getEpisodes(url, temporadaNumero, idIMDb):
 	codigo_fonte = abrir_url(url)
-	soup = BeautifulSoup(codigo_fonte)
 
+	match = re.compile('(?s)(.*)\n<footer').findall(codigo_fonte)
+
+	soup = BeautifulSoup(match[0])
+	#soup = BeautifulSoup(codigo_fonte)
+	
 	temporadas = soup.findAll('div', attrs={'class':'temporadas'})
 
 	i = 0
@@ -179,11 +187,12 @@ def getEpisodes(url, temporadaNumero, idIMDb):
 			i+=1
 
 		episodioNumero = int(episodioNumero)+i
-		mediaInfo = json.loads(tv.getSeasonEpisodio(idIMDb,(temporadaNumero+1),episodioNumero))
-		nome = 'Ep. '+str(episodioNumero)+' - '+mediaInfo['name'].encode('utf8')
-		ano = mediaInfo['aired'].encode('utf8')
-		infoLabels = {'Title':nome, 'Aired': mediaInfo['aired'], 'Actors':mediaInfo['actors'], 'Plot':mediaInfo['plot'], 'Season':mediaInfo['season'], 'Episode':mediaInfo['episode'], 'Writer': mediaInfo['writer'], 'Director':mediaInfo["director"], "Code":codigoIMDb }
-
+		#mediaInfo = json.loads(tv.getSeasonEpisodio(idIMDb,(temporadaNumero+1),episodioNumero))
+		#nome = 'Ep. '+str(episodioNumero)+' - '+mediaInfo['name'].encode('utf8')
+		#ano = mediaInfo['aired'].encode('utf8')
+		#infoLabels = {'Title':nome, 'Aired': mediaInfo['aired'], 'Actors':mediaInfo['actors'], 'Plot':mediaInfo['plot'], 'Season':mediaInfo['season'], 'Episode':mediaInfo['episode'], 'Writer': mediaInfo['writer'], 'Director':mediaInfo["director"], "Code":codigoIMDb }
+		nome = nomeOriginal
+		infoLabels = {'Title':nome}
 		poster = site+imagem
 
 		addVideo(nome, site+link, 3, site+imagem, 'episodio', temporadaNumero+1, episodioNumero, infoLabels, poster)
@@ -209,7 +218,11 @@ def pesquisa(url):
 		strPesquisa = teclado.getText()
 		
 		codigo_fonte_pesquisa = abrir_url(url, strPesquisa)
-		soup = BeautifulSoup(codigo_fonte_pesquisa)
+		
+		match = re.compile('(?s)(.*)\n<footer').findall(codigo_fonte_pesquisa)
+		
+		soup = BeautifulSoup(match[0])
+		#soup = BeautifulSoup(codigo_fonte_pesquisa)
 		filmes_series = soup.findAll('div', attrs={'class':'list'})
 
 		if(str(filmes_series[0].find('ul').text) != ''):
@@ -240,10 +253,14 @@ def pesquisa(url):
 				link = link[1:]
 				idIMDb = link.split('/')[-1]
 
-				mediaInfo = json.loads(tv.getSerieInfo(idIMDb))
-				print mediaInfo
-				infoLabels = {'Title':name, 'Released':mediaInfo['aired'], 'Plot':mediaInfo['plot']}
-				poster = mediaInfo['poster']
+				#mediaInfo = json.loads(tv.getSerieInfo(idIMDb))
+				#print mediaInfo
+				#infoLabels = {'Title':name, 'Released':mediaInfo['aired'], 'Plot':mediaInfo['plot']}
+
+				infoLabels = {'Title':name}
+
+				#poster = mediaInfo['poster']
+				poster = site+imagem
 				addDir(nome + ' ('+ano+')', siteAux+link, 4, siteAux+imagem,'serie', infoLabels, poster)
 		
 		#setVista('filmesSeries')
@@ -253,8 +270,8 @@ def download(url,name):
 
 	legendasOn = False
 
-	dialog = xbmcgui.Dialog()
-	servidor = dialog.select(u'Escolha o servidor para Download', ['Servidor #1', 'Servidor #2', 'Servidor #3'])
+	#dialog = xbmcgui.Dialog()
+	#servidor = dialog.select(u'Escolha o servidor para Download', ['Servidor #1', 'Servidor #2', 'Servidor #3'])
 	
 	stream, legenda = getStreamLegenda(url)
 	splitStream = stream.split('/')
@@ -263,7 +280,7 @@ def download(url,name):
 
 	tamanho = len(splitStream)
 
-	if servidor == 0:
+	"""if servidor == 0:
 		stream = 'http://az786600.vo.msecnd.net/'
 		if tamanho == 5:
 			stream += splitStream[3]+'/'
@@ -277,7 +294,7 @@ def download(url,name):
 		stream = 'http://cdn.tuga.su/'
 		if tamanho == 5:
 			stream += splitStream[3]+'/'
-		stream += nomeStream
+		stream += nomeStream"""
 
 	folder = xbmc.translatePath(selfAddon.getSetting('pastaDownloads'))
 
@@ -348,8 +365,10 @@ def getGeneros(url, tipo):
 
 
 	codigo_fonte=abrir_url(siteAux)
+	match = re.compile('(?s)(.*)\n<footer').findall(codigo_fonte)
 
-	soup = BeautifulSoup(codigo_fonte)
+	soup = BeautifulSoup(match[0])
+	#soup = BeautifulSoup(codigo_fonte)
 	generos = soup.find('select', attrs={'name':'genre'})
 
 	listaGeneros = re.compile('<option value="(.+?)">(.+?)</option>').findall(str(generos))
@@ -532,8 +551,8 @@ def clean(text):
 def player(name,url,iconimage,temporada,episodio):
 
 	mensagemprogresso = xbmcgui.DialogProgress()
-	dialog = xbmcgui.Dialog()
-	servidor = dialog.select(u'Escolha o servidor', ['Servidor #1', 'Servidor #2', 'Servidor #3'])
+	#dialog = xbmcgui.Dialog()
+	#servidor = dialog.select(u'Escolha o servidor', ['Servidor #1', 'Servidor #2', 'Servidor #3'])
 
 	stream, legenda = getStreamLegenda(url)
 
@@ -543,7 +562,7 @@ def player(name,url,iconimage,temporada,episodio):
 
 	tamanho = len(splitStream)
 
-	if servidor == 0:
+	"""if servidor == 0:
 		stream = 'http://az786600.vo.msecnd.net/'
 		if tamanho == 5:
 			stream += splitStream[3]+'/'
@@ -557,7 +576,7 @@ def player(name,url,iconimage,temporada,episodio):
 		stream = 'http://cdn.tuga.su/'
 		if tamanho == 5:
 			stream += splitStream[3]+'/'
-		stream += nomeStream
+		stream += nomeStream"""
 
 	mensagemprogresso.create('Tuga.io', u'Abrir emissão','Por favor aguarde...')
 

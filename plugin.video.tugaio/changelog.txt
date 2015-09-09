@@ -1,3 +1,9 @@
+v0.0.9
+- Correção de listagem de Séries
+- Correção de lsitagem por Generos
+- Desactivado a opção de escolha de servidor. -> Só existe um neste momento no site, quando tiverem mais, será reposto!
+- Desactivado (temporariamente) as informações media, tanto de Séries como Filmes. -> Erros com API.
+
 v0.0.8
 - Correção da pasta de Download para pasta de rede
 - Guarda informação de um Filme ou Episodio parado a qualquer momento, pergunta se pertende continuar na proxima vizualização!
