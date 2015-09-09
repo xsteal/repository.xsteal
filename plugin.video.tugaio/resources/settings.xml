@@ -9,8 +9,8 @@
     	<setting label="" type="folder" id="pastaDownloads" source="auto" option="writeable" default="Escolha a pasta para Download" enable="!eq(-2,false)"/>
     </category>
     <category label="Biblioteca">
-        <setting id="bibliotecaFilmes" type="folder" label="Pasta para Filmes" default="special://userdata/addon_data/plugin.video.tugaio/Filmes"/>
-        <setting id="bibliotecaSeries" type="folder" label="Pasta para Series" default="special://userdata/addon_data/plugin.video.tugaio/Series"/>
+        <setting id="bibliotecaFilmes" type="folder" label="Filmes" default="special://userdata/addon_data/plugin.video.tugaio/Filmes"/>
+        <setting id="bibliotecaSeries" type="folder" label="Series" default="special://userdata/addon_data/plugin.video.tugaio/Series"/>
     </category>
     <category label="Tipos de vista">
       <setting label="Definições de vista:" type="lsep" />

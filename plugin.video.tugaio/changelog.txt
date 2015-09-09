@@ -1,7 +1,11 @@
+v0.0.8
+- Correção da pasta de Download para pasta de rede
+- Guarda informação de um Filme ou Episodio parado a qualquer momento, pergunta se pertende continuar na proxima vizualização!
+- Problemas na busca de Filmes e Series resolvido. 
+
 v0.0.7
 - Re-branding, obrigado johnny88
 - Correção de API de filmes, desativado de momento! 
-
 
 v0.0.6
 - Re-branding, obrigado johnny88

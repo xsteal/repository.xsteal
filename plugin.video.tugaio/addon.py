@@ -1,13 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-#Agredecimentos ao Manfarricos
+#Agredecimentos ao Mafarricos
 
-import urllib,urllib2,re,xbmcplugin,xbmcgui,xbmcaddon,xbmc,os,json,threading
+import urllib,urllib2,re,xbmcplugin,xbmcgui,xbmcaddon,xbmc,os,json,threading,xbmcvfs
 from bs4 import BeautifulSoup
 from resources.lib import Downloader #Enen92 class
 from resources.lib import TVDB
 from resources.lib import MovieDB
+from resources.lib import Player
 
 
 addon_id    = xbmcaddon.Addon().getAddonInfo("id")
@@ -95,7 +96,7 @@ def getFilmes(url, pagina):
 		poster = site+imagem
 		#match=re.compile('jwplayer\(\'player_get_hard\'\).setup\(\{\n                            file: \'(.+?)\',\n                            aspectratio: \'.+?\',\n                            width: \'.+?\',\n                            height: \'.+?\',\n                            skin: \'.+?\',\n                            primary: ".+?",\n                            androidhls:.+?,\n                            logo : \{\n                                file: ".+?",\n                                link: ".+?",\n                                hide: .+?\n                            \},\n                            tracks:\n                                    \[\n                                        \{\n                                            file: "(.+?)",\n                                            default: ".+?"\n                                        \}\n                                    \],\n                            captions: \{\n                                backgroundOpacity: .+?                            \}\n\n                        \}\);').findall(codigo_fonte)
 		mensagemprogresso.update(percentagem, "", nome, "")
-		addVideo(nome + ' ('+ano+')', siteAux+link, 3, siteAux+imagem, 'filme', infoLabels, poster)
+		addVideo(nome + ' ('+ano+')', siteAux+link, 3, siteAux+imagem, 'filme', 0, 0, infoLabels, poster)
 		if mensagemprogresso.iscanceled(): break
 		i+=1
 		
@@ -185,7 +186,7 @@ def getEpisodes(url, temporadaNumero, idIMDb):
 
 		poster = site+imagem
 
-		addVideo(nome, site+link, 3, site+imagem, 'episodio', infoLabels, poster)
+		addVideo(nome, site+link, 3, site+imagem, 'episodio', temporadaNumero+1, episodioNumero, infoLabels, poster)
 	#setVista('episodios')
 	vista_episodios()
 
@@ -228,7 +229,7 @@ def pesquisa(url):
 				infoLabels = {'Title': name, 'Year': ano}
 				poster = site+imagem
 				
-				addVideo(nome + ' ('+ano+')', siteAux+link, 3, siteAux+imagem,'filme', infoLabels, poster)
+				addVideo(nome + ' ('+ano+')', siteAux+link, 3, siteAux+imagem,'filme', 0, 0, infoLabels, poster)
 
 			addDir('', '', '', os.path.join(artfolder,'novo','nada.png'), 0)
 
@@ -278,7 +279,7 @@ def download(url,name):
 			stream += splitStream[3]+'/'
 		stream += nomeStream
 
-	folder = selfAddon.getSetting('pastaDownloads')
+	folder = xbmc.translatePath(selfAddon.getSetting('pastaDownloads'))
 
 	urlAux = clean(stream.split('/')[-1])
 	extensaoMedia = clean(urlAux.split('.')[-1])
@@ -440,7 +441,7 @@ def abrir_url(url,pesquisa=False):
 		data = urllib.urlencode({'procurar' : pesquisa})
 		req = urllib2.Request(url,data)
 	else: req = urllib2.Request(url)
-	req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+	req.add_header('User-Agent', 'Mozilla/5.0')
 	response = urllib2.urlopen(req)
 	link=response.read()
 	response.close()
@@ -497,7 +498,7 @@ def addDirSeason(name,url,mode,iconimage,pagina,temporada,idIMDbSerie,infoLabels
 	ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=True)
 	return ok
 
-def addVideo(name,url,mode,iconimage,tipo,infoLabels=False,poster=False):
+def addVideo(name,url,mode,iconimage,tipo,temporada,episodio,infoLabels=False,poster=False):
 	if infoLabels: infoLabelsAux = infoLabels
 	else: infoLabelsAux = {'Title': name}
 
@@ -512,7 +513,7 @@ def addVideo(name,url,mode,iconimage,tipo,infoLabels=False,poster=False):
 		xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
 
 
-	u=sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
+	u=sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&temporada="+str(temporada)+"&episodio="+str(episodio)+"&name="+urllib.quote_plus(name)+"&iconimage="+urllib.quote_plus(iconimage)
 	ok=True
 	contextMenuItems = []
 	liz=xbmcgui.ListItem(name, iconImage=posterAux, thumbnailImage=posterAux)
@@ -528,7 +529,7 @@ def clean(text):
 	regex = re.compile("|".join(map(re.escape, command.keys())))
 	return regex.sub(lambda mo: command[mo.group(0)], text)
 
-def player(name,url,iconimage):
+def player(name,url,iconimage,temporada,episodio):
 
 	mensagemprogresso = xbmcgui.DialogProgress()
 	dialog = xbmcgui.Dialog()
@@ -560,19 +561,53 @@ def player(name,url,iconimage):
 
 	mensagemprogresso.create('Tuga.io', u'Abrir emissão','Por favor aguarde...')
 
+
 	playlist = xbmc.PlayList(1)
 	playlist.clear()
 	listitem = xbmcgui.ListItem(name, iconImage="DefaultVideo.png", thumbnailImage=iconimage)
 	listitem.setInfo("Video", {"title":name})
 	listitem.setProperty('mimetype', 'video/x-msvideo')
 	listitem.setProperty('IsPlayable', 'true')
+
+	playlist.add(stream, listitem)
+
+	idIMDb = url.split('/')[-1]
+	if temporada == 0 and episodio == 0:
+		ano = str(re.compile('\((.+?)\)').findall(name)[0])
+	else:
+		ano = 2000
+
+	pastaData = ''
+	"""url, idFilme, pastaData, temporada, episodio, nome, ano"""
+	if temporada == 0 and episodio == 0:
+		pastaData = selfAddon.getSetting('bibliotecaFilmes')
+	else:
+		pastaData = selfAddon.getSetting('bibliotecaSeries')
+
 	
+	mensagemprogresso.update(50, "", u'Boa Sessão!!!', "")
+	print "url: "+url+" idIMDb: "+idIMDb+" pastaData: "+pastaData+"\n temporada: "+str(temporada)+" episodio: "+str(episodio)+" \nnome: "+name+" ano:"+str(ano)
+	
+
+	player = Player.Player(url=url, idFilme=idIMDb, pastaData=pastaData, temporada=temporada, episodio=episodio, nome=name, ano=ano, logo=os.path.join(addonfolder,'icon.png'))
+	mensagemprogresso.close()
+	player.play(playlist)
+	player.setSubtitles(legenda)
+
+	while player.playing:
+		xbmc.sleep(5000)
+		player.trackerTempo()
+
+
+
+	
+	"""
 	playlist.add(stream, listitem)
 	mensagemprogresso.update(50, "", u'Boa Sessão!!!', "")
 	xbmcPlayer = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
 	mensagemprogresso.close()
 	xbmcPlayer.play(playlist)
-	xbmc.Player().setSubtitles(legenda)
+	xbmc.Player().setSubtitles(legenda)"""
 
 ########################################################################################################
 #                                               GET PARAMS                                                 #
@@ -604,6 +639,7 @@ legenda=None
 pagina=None
 temporada=None
 idIMDbSerie=None
+episodio=None
 
 try: url=urllib.unquote_plus(params["url"])
 except: pass
@@ -614,6 +650,8 @@ except: pass
 try: name=urllib.unquote_plus(params["name"])
 except: pass
 try: temporada=int(params["temporada"])
+except: pass
+try: episodio=int(params["episodio"])
 except: pass
 try: mode=int(params["mode"])
 except: pass
@@ -636,7 +674,7 @@ print "PAGINA: "+str(pagina)
 if mode==None or url==None or len(url)<1: categorias()
 elif mode==1: getFilmes(url, pagina)
 elif mode==2: getSeries(url, pagina)
-elif mode==3: player(name, url, iconimage)
+elif mode==3: player(name, url, iconimage, temporada, episodio)
 elif mode==4: getSeasons(url)
 elif mode==5: getEpisodes(url, temporada, idIMDbSerie)
 elif mode==6: pesquisa(url)
