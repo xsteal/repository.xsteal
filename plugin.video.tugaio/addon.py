@@ -42,6 +42,7 @@ def getLiguaMetaDados():
 	return lang
 
 def categorias():
+	
 	if getSetting("pref_site") == 'Geral' or getSetting("pref_site") == 'Ambos':
 		addDir('Filmes', site+'filmes', 1, os.path.join(artfolder,skin,'filmes.png'), 0)
 		addDir('Series', site+'series', 2, os.path.join(artfolder,skin,'series.png'), 0)
@@ -57,8 +58,29 @@ def categorias():
 	addDir('Series IMDB Rating', site+'series?orderby=1', 2, os.path.join(artfolder,skin,'seriesimdb.png'), 0)
 	if "confluence" in xbmc.getSkinDir(): addDir('', '', '', os.path.join(artfolder,skin,'nada.png'), 0)
 	addDir('Definicoes', site, 1000, os.path.join(artfolder,skin,'definicoes.png'), 0)
-	#setVista('menu')
+
 	vista_menu()
+
+def login(site):
+	username = getSetting("username")
+	password = getSetting("password")
+
+	codigo_fonte = abrir_url(site)
+	match = re.compile('data-sitekey="(.+?)"').findall(codigo_fonte)[0]
+
+	codigo_fonte = abrir_url('http://www.google.com/recaptcha/api/challenge?k='+match)
+	recaptcha = re.compile('challenge : \'(.+?)\'').findall(codigo_fonte)[0]
+
+	data = urllib.urlencode({'username': username, 'password': password, 'g-recaptcha-response': recaptcha})
+	req = urllib2.Request(site,data)
+	req.add_header('User-Agent', 'Mozilla/5.0')
+	response = urllib2.urlopen(req)
+
+
+
+	link=response.read()
+	response.close()
+	print link
 
 def getFilmes(url, pagina):
 
@@ -115,7 +137,7 @@ def getFilmes(url, pagina):
 			addDir('Proximo >>', siteAux+proximo, 1, os.path.join(artfolder,skin,'proximo.png'), pagina)
 	
 	mensagemprogresso.close()
-	#setVista('filmesSeries')
+	
 	vista_filmesSeries()
 
 def getSeries(url, pagina):
@@ -144,7 +166,7 @@ def getSeries(url, pagina):
 		for proximo in match_prox_ant:
 			proximo = proximo[1:]
 			addDir('Proximo >>', site+proximo, 2, os.path.join(artfolder,skin,'proximo.png'), pagina)
-	#setVista('filmesSeries')
+	
 	vista_filmesSeries()
 
 def getSeasons(url):
@@ -159,7 +181,7 @@ def getSeasons(url):
 	for temporada in soup.findAll('h2'):
 		addDirSeason(temporada.text, url, 5, os.path.join(artfolder,skin,'temporadas','temporada'+str(temporadaN+1)+'.png'), 0, temporadaN, idIMDb)
 		temporadaN+=1
-	#setVista('temporadas')
+	
 	vista_temporadas()
 
 
@@ -196,7 +218,7 @@ def getEpisodes(url, temporadaNumero, idIMDb):
 		poster = site+imagem
 
 		addVideo(nome, site+link, 3, site+imagem, 'episodio', temporadaNumero+1, episodioNumero, infoLabels, poster)
-	#setVista('episodios')
+	
 	vista_episodios()
 
 def pesquisa(url):
@@ -262,8 +284,7 @@ def pesquisa(url):
 				#poster = mediaInfo['poster']
 				poster = site+imagem
 				addDir(nome + ' ('+ano+')', siteAux+link, 4, siteAux+imagem,'serie', infoLabels, poster)
-		
-		#setVista('filmesSeries')
+
 		vista_filmesSeries()
 
 def download(url,name):
@@ -333,14 +354,14 @@ def getStreamLegenda(url):
 
 	codigo_fonte = abrir_url(url)
 
-	getStream=re.compile('file: \'(.+?)\'').findall(codigo_fonte) 
-	getLegenda=re.compile('file: \"(.+?)\"').findall(codigo_fonte)
+	getStream=re.compile('file: \"http(.+?)\"').findall(codigo_fonte) 
+	getLegenda=re.compile('file: \"\/subtitles(.+?)\"').findall(codigo_fonte)
 	stream = ''
 	legenda = ''
 		
-	for streamAux in getStream: stream = streamAux
+	for streamAux in getStream: stream = "http"+streamAux
 	if legendasOn:
-		for legendaAux in getLegenda: legenda = siteAux+legendaAux
+		for legendaAux in getLegenda: legenda = siteAux+'subtitles'+legendaAux
 
 	return stream, legenda
 
@@ -456,11 +477,16 @@ def tryFTPfolder(file_folder):
 	else: xbmcvfs.mkdir(file_folder)
 
 def abrir_url(url,pesquisa=False):
+	#header = {'User-Agent': 'Mozilla/5.0'}
+	
+	header = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11','Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8','Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3','Accept-Encoding': 'none', 'Accept-Language': 'en-US,en;q=0.8','Connection': 'keep-alive'}
+
 	if pesquisa:
 		data = urllib.urlencode({'procurar' : pesquisa})
-		req = urllib2.Request(url,data)
-	else: req = urllib2.Request(url)
-	req.add_header('User-Agent', 'Mozilla/5.0')
+		req = urllib2.Request(url,data, headers=header)
+	else:
+		req = urllib2.Request(url, headers=header)
+	
 	response = urllib2.urlopen(req)
 	link=response.read()
 	response.close()
@@ -551,9 +577,13 @@ def clean(text):
 def player(name,url,iconimage,temporada,episodio):
 
 	mensagemprogresso = xbmcgui.DialogProgress()
+	mensagemprogresso.create('Tuga.io', u'Abrir emissão','Por favor aguarde...')
+
+
+
 	#dialog = xbmcgui.Dialog()
 	#servidor = dialog.select(u'Escolha o servidor', ['Servidor #1', 'Servidor #2', 'Servidor #3'])
-
+	mensagemprogresso.update(25, "", u'Obter video e legenda', "")
 	stream, legenda = getStreamLegenda(url)
 
 	splitStream = stream.split('/')
@@ -578,9 +608,10 @@ def player(name,url,iconimage,temporada,episodio):
 			stream += splitStream[3]+'/'
 		stream += nomeStream"""
 
-	mensagemprogresso.create('Tuga.io', u'Abrir emissão','Por favor aguarde...')
+	
 
-
+	mensagemprogresso.update(50, "", u'Prepara-te, vai começar!', "")
+	
 	playlist = xbmc.PlayList(1)
 	playlist.clear()
 	listitem = xbmcgui.ListItem(name, iconImage="DefaultVideo.png", thumbnailImage=iconimage)
@@ -597,14 +628,14 @@ def player(name,url,iconimage,temporada,episodio):
 		ano = 2000
 
 	pastaData = ''
-	"""url, idFilme, pastaData, temporada, episodio, nome, ano"""
+	
 	if temporada == 0 and episodio == 0:
 		pastaData = selfAddon.getSetting('bibliotecaFilmes')
 	else:
 		pastaData = selfAddon.getSetting('bibliotecaSeries')
 
 	
-	mensagemprogresso.update(50, "", u'Boa Sessão!!!', "")
+	mensagemprogresso.update(75, "", u'Boa Sessão!!!', "")
 	print "url: "+url+" idIMDb: "+idIMDb+" pastaData: "+pastaData+"\n temporada: "+str(temporada)+" episodio: "+str(episodio)+" \nnome: "+name+" ano:"+str(ano)
 	
 
@@ -617,16 +648,6 @@ def player(name,url,iconimage,temporada,episodio):
 		xbmc.sleep(5000)
 		player.trackerTempo()
 
-
-
-	
-	"""
-	playlist.add(stream, listitem)
-	mensagemprogresso.update(50, "", u'Boa Sessão!!!', "")
-	xbmcPlayer = xbmc.Player(xbmc.PLAYER_CORE_AUTO)
-	mensagemprogresso.close()
-	xbmcPlayer.play(playlist)
-	xbmc.Player().setSubtitles(legenda)"""
 
 ########################################################################################################
 #                                               GET PARAMS                                                 #

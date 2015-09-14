@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <settings>
     <category label="Definições Gerais">
+        <!--<setting label="Conta Tuga.io:" type="lsep" />
+        <setting id="username" type="text" label="Username" default=""/>
+        <setting id="password" type="text" label="Password" default="" option="hidden" enable="!eq(-1,false)"/>
+        <setting type="sep" />  -->    
 		<setting id="pref_site" type="select" label="Site Predefinido" values="Geral|Kids|Ambos" default="Ambos" />
         <!--<setting id="linguaMetaDados" type="enum" label="Lingua Metadados" values="Portugues|Ingles" default="0" />-->
     </category>
@@ -15,7 +19,7 @@
     <category label="Tipos de vista">
       <setting label="Definições de vista:" type="lsep" />
      <setting id="menuView" type="enum" label="Vista de Menu" values="Lista|Lista Grande" default="0"/>
-     <setting id="filmesSeriesView" type="enum" label="Vista de Filmes e Séries" values="Lista|Lista Grande|Miniatura|Posters|Fanart|Media Info 1|Media Info 2|Media Info 3" default="7"/>
+     <setting id="filmesSeriesView" type="enum" label="Vista de Filmes e Séries" values="Lista|Lista Grande|Miniatura|Posters|Fanart|Media Info 1|Media Info 2|Media Info 3" default="0"/>
      <setting id="temporadasView" type="enum" label="Vista de temporadas" values="Lista|Lista Grande|Miniatura" default="2"/>
      <setting id="episodiosView" type="enum" label="Vista de episodios" values="Lista|Lista Grande|Miniatura" default="2"/>
    </category>
