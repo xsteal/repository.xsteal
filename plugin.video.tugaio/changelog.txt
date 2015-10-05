@@ -1,3 +1,6 @@
+v0.1.1
+- Comunicado.
+
 v0.1.0
 - Correção de procura de Stream e de Legenda.
 - Re-configuração para obter informação de páginas.

@@ -42,7 +42,9 @@ def getLiguaMetaDados():
 	return lang
 
 def categorias():
-	
+	addDir('[COLOR red][B]COMUNICADO[/B][/COLOR]', site, 666, os.path.join(artfolder, 'nada.jpg'), 0)
+	addDir('', '', '', os.path.join(artfolder,'nada.png'), 0)
+
 	if getSetting("pref_site") == 'Geral' or getSetting("pref_site") == 'Ambos':
 		addDir('Filmes', site+'filmes', 1, os.path.join(artfolder,skin,'filmes.png'), 0)
 		addDir('Series', site+'series', 2, os.path.join(artfolder,skin,'series.png'), 0)
@@ -177,6 +179,8 @@ def getSeasons(url):
 
 	soup = BeautifulSoup(match[0])
 	idIMDb = url.split('/')[-1]
+
+	titulo = re.compile('<div class="title"><span class="t">(.+?)<\/span>').findall(codigo_fonte)[0]
 	
 	for temporada in soup.findAll('h2'):
 		addDirSeason(temporada.text, url, 5, os.path.join(artfolder,skin,'temporadas','temporada'+str(temporadaN+1)+'.png'), 0, temporadaN, idIMDb)
@@ -203,17 +207,19 @@ def getEpisodes(url, temporadaNumero, idIMDb):
 		episodioNomeSplit = episodioNumero.split('|')
 		episodioNumero = episodioNomeSplit[0]
 		
+		nomeOriginal = episodioNomeSplit[-1]
+
 		codigoIMDb = link.split('/')[-1]
 		
 		if int(episodioNumero) == 0:
 			i+=1
 
-		episodioNumero = int(episodioNumero)+i
+		episodioNumero = str(int(episodioNumero)+i)
 		#mediaInfo = json.loads(tv.getSeasonEpisodio(idIMDb,(temporadaNumero+1),episodioNumero))
 		#nome = 'Ep. '+str(episodioNumero)+' - '+mediaInfo['name'].encode('utf8')
 		#ano = mediaInfo['aired'].encode('utf8')
 		#infoLabels = {'Title':nome, 'Aired': mediaInfo['aired'], 'Actors':mediaInfo['actors'], 'Plot':mediaInfo['plot'], 'Season':mediaInfo['season'], 'Episode':mediaInfo['episode'], 'Writer': mediaInfo['writer'], 'Director':mediaInfo["director"], "Code":codigoIMDb }
-		nome = nomeOriginal
+		nome = '[B]'+str(temporadaNumero+1)+'x'+episodioNumero+'[/B] '+nomeOriginal
 		infoLabels = {'Title':nome}
 		poster = site+imagem
 
@@ -423,6 +429,13 @@ def addBiblioteca(nome, url, tipo, temporada=False, episodio=False):
 	if updatelibrary: xbmc.executebuiltin("XBMC.UpdateLibrary(video)")
 	return True
 
+def comunicado():
+	texto = "Boa tarde,\nVenho vos anunciar que o addon Tuga.io vai ser descontinuado. A razão que me levou a fazer isto tem a haver com vários factos que vou enumerar de seguida.\n\n1º - Falta de tempo e paciência. Poderia ser só uma condicionante ou o tempo ou a paciência mas os dois juntos é difícil. A condicionante paciência vem do facto de sempre que atualizo, os mesmos criadores do site Tuga.io tentavam dificultar a vida a quem tenta dar visibilidade ao seu projeto. Lançaram o projeto para os utilizadores da internet terem acesso livre aos diversos conteúdos de filmes e séries, colocando regras que seria grátis para todos e de forma fácil. Implementaram o registo de utilizadores a indicarem que o mesmo não seria necessário para visualizar o conteúdo. No dia 01 de Outubro de 2015 os diversos utilizadores do projeto receberam uma notícia que os registos estavam fechados que era necessário conta para ver os conteúdos. Mudaram as regras, está no direito deles mas para também combater um addon que lhe dava visibilidade.\n2º - Bloqueios constantes. Nos últimos meses vocês verificavam que o addon deixava de funcionar de um momento para o outro. Tive a difícil tarefa de tentar perceber o bloqueio e contornar-lo para que vocês, utilizadores do addon, pudessem utilizar.\nO addon poderá continuar, quem quiser pode pegar no código já desenvolvido por mim e lançar novas atualizações, terei todo o gosto em ajudar quem quiser continuar o mesmo. Posso ajudar desde a interpretação de código já feito, como a implementação de novas funcionalidades. Tinha algumas ideias para o addon, que quem pegar nele direi e ajudarei na implementação, ideias que já tinham sido começado a ser implementadas mas não estavam a 100%.\nEu como desenvolvedor, não irei parar e tenho ideias para lançar no meu repositório, poderá ser um lançamento demorado mas que até ao final do ano, eu espero lançar. A ideia principal não será para a visualização de filmes nem séries, mas será um ideia que muitos de vocês que gostam de futebol poderão usar. E adianto também que não é um addon para ver o futebol mas é para ser acompanhado o futebol pelo Kodi.\nAgradeço a todos que usaram este addon durante meses, dos elogios e das sugestões que foram, ou não implementadas, mas não estavam esquecidas.\nAgradeço ao Carlos Correia e ao Enen pela ajuda e dicas no desenvolvimento do mesmo. E ao João Ferreira pelas imagens feitas e disponibilizadas para o addon.\nAos interessados na continuação do addon, poderão contactar via MP ou podem enviar um email para xsteal.projetos@gmail.com.\nObrigado a todos."
+	print texto
+	xbmcgui.Dialog().ok("Tuga.io", texto)
+	addDir('Entrar novamente','url',None,os.path.join(artfolder,skin,'retroceder.png'),True)
+	vista_menu()
+	xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def abrirDefinincoes():
 	selfAddon.openSettings()
@@ -631,8 +644,10 @@ def player(name,url,iconimage,temporada,episodio):
 	
 	if temporada == 0 and episodio == 0:
 		pastaData = selfAddon.getSetting('bibliotecaFilmes')
+		name = re.compile('(.+?) \(.+?\)').findall(name)[0]
 	else:
 		pastaData = selfAddon.getSetting('bibliotecaSeries')
+		name = re.compile('(.+?)\| (.+)').findall(name)[0][1]
 
 	
 	mensagemprogresso.update(75, "", u'Boa Sessão!!!', "")
@@ -721,5 +736,6 @@ elif mode==6: pesquisa(url)
 elif mode==7: download(url, name)
 elif mode==8: getGeneros(url, 'filmes')
 elif mode==9: getGeneros(url, 'series')
+elif mode==666: comunicado()
 elif mode==1000: abrirDefinincoes()
 xbmcplugin.endOfDirectory(int(sys.argv[1]))

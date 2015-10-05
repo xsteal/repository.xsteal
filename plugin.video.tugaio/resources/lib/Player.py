@@ -11,6 +11,7 @@ import urllib2
 import re
 import sys 
 import traceback
+import json
 
 #enen92 class (RatoTv) adapted for Tuga.io addon
 
@@ -107,24 +108,31 @@ class Player(xbmc.Player):
 
                 if int(self.temporada) != 0 and int(self.episodio) != 0:
                     print "\n\n\n\n\n ADICIONAR SERIE \n\n\n\n\n"
-                    if xbmc.getCondVisibility('Library.HasContent(TVShows)'):
-                        print "\n\n\n\n\n ADICIONAR SERIE DEPOIS \n\n\n\n\n"
-                        dados = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes", "params": {"filter":{"and": [{"field": "season", "operator": "is", "value": "%s"}, {"field": "episode", "operator": "is", "value": "%s"}]}, "properties": ["title", "plot", "votes", "rating", "writer", "firstaired", "playcount", "runtime", "director", "productioncode", "season", "episode", "originaltitle", "showtitle", "lastplayed", "fanart", "thumbnail", "file", "resume", "tvshowid", "dateadded", "uniqueid"]}, "id": 1}' % (self.temporada, self.episodio))
-                        dados = unicode(dados, 'utf-8', erros='ignore')
-                        dados = json.loads(dados)
-                        dados = dados['result']['episodes']
-                        dados = [i for i in dados if titulo in i['file']][0]
-                        xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.SetEpisodeDetails", "params": {"episodeid" : %s, "playcount" : 1 }, "id": 1 }' % str(dados['episodeid']))
+                    
+                    #if xbmc.getCondVisibility('Library.HasContent(TVShows)'):
+                    print "Check if tvshow episode exists in library when marking as watched\n\n"
+                    titulo = re.sub('[^-a-zA-Z0-9_.()\\\/ ]+', '',  self.nome)
+                    dados = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes", "params": {"filter":{"and": [{"field": "season", "operator": "is", "value": "%s"}, {"field": "episode", "operator": "is", "value": "%s"}]}, "properties": ["imdbnumber", "title", "year"]}, "id": 1}' % (self.temporada, self.episodio))
+                    dados = unicode(dados, 'utf-8', erros='ignore')
+                    dados = json.loads(dados)
+                    dados = dados['result']['episodes']
+                    dados = [i for i in dados if titulo in i['file']][0]
+                    xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.SetEpisodeDetails", "params": {"episodeid" : %s, "playcount" : 1 }, "id": 1 }' % str(dados['episodeid']))
                 else:
                     print "\n\n\n\n\n ADICIONAR FILMES \n\n\n\n\n"
-                    if xbmc.getCondVisibility('Library.HasContent(Movies)'):
-                        print "\n\n\n\n\n ADICIONAR FILMES DEPOIS \n\n\n\n\n"
-                        dados = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovies", "params": {"filter":{"or": [{"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}]}, "properties" : ["file"]}, "id": 1}' % (self.ano, str(int(self.ano)+1), str(int(self.ano)-1)))
-                        dados = unicode(dados, 'utf-8', errors='ignore')
-                        dados = json.loads(dados)
-                        dados = dados['result']['movies']
-                        dados = [i for i in dados if titulo in i['file']][0]
-                        xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.SetMovieDetails", "params": {"movieid" : %s, "playcount" : 1 }, "id": 1 }' % str(dados['movieid']))
+                    
+                    #if xbmc.getCondVisibility('Library.HasContent(Movies)'):
+                    print "Check if movie exists in library when marking as watched\n\n" 
+                    titulo = re.sub('[^-a-zA-Z0-9_.()\\\/ ]+', '',  self.nome)
+                
+                    dados = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovies", "params": {"filter":{"or": [{"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}]}, "properties" : ["imdbnumber", "originaltitle", "year"]}, "id": 1}' % (self.ano, str(int(self.ano)+1), str(int(self.ano)-1)))
+                    dados = unicode(dados, 'utf-8', errors='ignore')
+                    dados = json.loads(dados)
+                    print dados
+                    dados = dados['result']['movies']
+                    print dados
+                    dados = [i for i in dados if self.idFilme in i['file']][0]
+                    xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.SetMovieDetails", "params": {"movieid" : %s, "playcount" : 1 }, "id": 1 }' % str(dados['movieid']))
             except:
                 pass
 
