@@ -67,9 +67,9 @@ def menu():
         vista_menu()
 
 def minhaConta():
-	addDir('Favoritos', __SITE__+'favoritos.php', 11, os.path.join(__ART_FOLDER__, __SKIN__, 'filmes.png'), 1)
-	addDir('Agendados', __SITE__+'vermaistarde.php', 11, os.path.join(__ART_FOLDER__, __SKIN__, 'series.png'), 1)
-	addDir('Últimos Filmes Vistos', __SITE__+'vistos.php', 11, os.path.join(__ART_FOLDER__, __SKIN__, 'filmes.png'), 1)
+	addDir('Favoritos', __SITE__+'favoritos.php', 11, os.path.join(__ART_FOLDER__, __SKIN__, 'favoritos.png'), 1)
+	addDir('Agendados', __SITE__+'vermaistarde.php', 11, os.path.join(__ART_FOLDER__, __SKIN__, 'agendados.png'), 1)
+	addDir('Últimos Filmes Vistos', __SITE__+'vistos.php', 11, os.path.join(__ART_FOLDER__, __SKIN__, 'ultimos.png'), 1)
 
 	vista_menu()
 
@@ -156,8 +156,10 @@ def getList(url, pagina):
 			infoLabels = {'Title':nomeOriginal.decode('iso-8859-1').encode('utf8'), 'Aired':ano, 'Plot': plot.decode('iso-8859-1').encode('utf8')}
 			addDir(nomeOriginal.decode('iso-8859-1').encode('utf8')+ ' ('+ano+')', __SITE__+link, 4, imagem, pagina, 'serie', infoLabels, imagem)
 			
-	
-	addDir('Proximo >>', __SITE__+tipo+'.php?pagina='+str(int(pagina)+1)+'&categoria='+categoria, 1, os.path.join(__ART_FOLDER__, __SKIN__, 'proximo.png'), int(pagina)+1)
+	if categoria == '':
+		addDir('Proximo >>', __SITE__+tipo+'.php?pagina='+str(int(pagina)+1), 1, os.path.join(__ART_FOLDER__, __SKIN__, 'proximo.png'), int(pagina)+1)
+	else:
+		addDir('Proximo >>', __SITE__+tipo+'.php?pagina='+str(int(pagina)+1)+'&categoria='+categoria, 1, os.path.join(__ART_FOLDER__, __SKIN__, 'proximo.png'), int(pagina)+1)
 
 	vista_filmesSeries()
 
