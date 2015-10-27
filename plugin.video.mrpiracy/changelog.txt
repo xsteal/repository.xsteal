@@ -1,0 +1,8 @@
+v0.0.1
+- Sistema Login
+- Ver filmes
+- Ver series
+- Pesquisa
+- Filmes/Series por categorias
+- Filmes/Series por ano
+
