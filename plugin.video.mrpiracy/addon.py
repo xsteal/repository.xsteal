@@ -147,14 +147,15 @@ def getList(url, pagina):
 		match += re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Criador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+\s+.+)<\/span>').findall(codigo_fonte)
 		#series normais
 		#match += re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Criador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+?)<\/span>').findall(codigo_fonte)
-	
+
+
 	for imagem, nome1, nome2, link, nome3, genero, ano, nomeOriginal, realizador, elenco, plot in match:
 		if tipo == 'filmes':
-			infoLabels = {'Title': nomeOriginal.decode('iso-8859-1').encode('utf8'), 'Year': ano, 'Genre': genero.decode('iso-8859-1').encode('utf8'), 'Plot': plot.decode('iso-8859-1').encode('utf8') }
-			addVideo(nomeOriginal.decode('iso-8859-1').encode('utf8')+' ('+ano+')', __SITE__+link, 3, imagem, 'filme', 0, 0, infoLabels, imagem)
+			infoLabels = {'Title': nomeOriginal, 'Year': ano, 'Genre': genero, 'Plot': plot }
+			addVideo(nomeOriginal+' ('+ano+')', __SITE__+link, 3, imagem, 'filme', 0, 0, infoLabels, imagem)
 		else:
-			infoLabels = {'Title':nomeOriginal.decode('iso-8859-1').encode('utf8'), 'Aired':ano, 'Plot': plot.decode('iso-8859-1').encode('utf8')}
-			addDir(nomeOriginal.decode('iso-8859-1').encode('utf8')+ ' ('+ano+')', __SITE__+link, 4, imagem, pagina, 'serie', infoLabels, imagem)
+			infoLabels = {'Title':nomeOriginal, 'Aired':ano, 'Plot': plot}
+			addDir(nomeOriginal+ ' ('+ano+')', __SITE__+link, 4, imagem, pagina, 'serie', infoLabels, imagem)
 			
 	if categoria == '':
 		addDir('Proximo >>', __SITE__+tipo+'.php?pagina='+str(int(pagina)+1), 1, os.path.join(__ART_FOLDER__, __SKIN__, 'proximo.png'), int(pagina)+1)
@@ -312,11 +313,11 @@ def pesquisa():
 
 			for imagem, nome1, nome2, link, nome3, genero, ano, nomeOriginal, realizador, elenco, plot in match:
 				if server == 0:
-					infoLabels = {'Title': nomeOriginal.decode('iso-8859-1').encode('utf8'), 'Year': ano, 'Genre': genero.decode('iso-8859-1').encode('utf8'), 'Plot': plot.decode('iso-8859-1').encode('utf8') }
+					infoLabels = {'Title': nomeOriginal, 'Year': ano, 'Genre': genero, 'Plot': plot }
 					addVideo(nomeOriginal+' ('+ano+')', __SITE__+link, 3, imagem, 'filme', 0, 0, infoLabels, imagem)
 				elif server == 1:
-					infoLabels = {'Title':nomeOriginal.decode('iso-8859-1').encode('utf8'), 'Aired':ano, 'Plot': plot.decode('iso-8859-1').encode('utf8')}
-					addDir(nomeOriginal.decode('iso-8859-1').encode('utf8')+ ' ('+ano+')', __SITE__+link, 4, imagem, pagina, 'serie', infoLabels, imagem)
+					infoLabels = {'Title':nomeOriginal, 'Aired':ano, 'Plot': plot}
+					addDir(nomeOriginal+ ' ('+ano+')', __SITE__+link, 4, imagem, pagina, 'serie', infoLabels, imagem)
 		else:
 			addDir('Voltar', 'url', None, os.path.join(__ART_FOLDER__, __SKIN__, 'retroceder.png'), 0)	
 
@@ -372,17 +373,20 @@ def getGeneros(url):
 
 	match = re.compile('<div id="item1" class="item">\s+<label for="genre1" id="genre1Label"><a style="font-family: Tahoma; color: #8D8D8D;font-size: 11px;padding-left: 5px;float: left;width: 142px;font-weight: normal;text-decoration: initial;" href="(.+?)">(.+?)<\/a><\/label>\s+<\/div>').findall(codigo_fonte)
 
+	print match 
+
 	for link, nome in match:
 		if 'filmes.php' in url:
-			addDir(nome.decode('iso-8859-1').encode('utf8'), __SITE__+link, 1, os.path.join(__ART_FOLDER__, __SKIN__, 'generos.png'), 1)
+			addDir(nome.encode('utf8'), __SITE__+link, 1, os.path.join(__ART_FOLDER__, __SKIN__, 'generos.png'), 1)
 		else:
-			addDir(nome.decode('iso-8859-1').encode('utf8'), url+link, 1, os.path.join(__ART_FOLDER__, __SKIN__, 'generos.png'), 1)
+			addDir(nome.encode('utf8'), url+link, 1, os.path.join(__ART_FOLDER__, __SKIN__, 'generos.png'), 1)
 
 def getYears(url):
 	net = Net()
 	codigo_fonte = net.http_GET(url, headers=__HEADERS__).content
 
-	match = re.compile('<div id="(.+?)" class="item">\s+<label for="(.+?)" id="(.+?)"><a style=\'font-family: Tahoma; color: #8D8D8D;\' class="active" href="(.+?)">(.+?)<\/a><\/label>\s+<\/div>').findall(codigo_fonte)
+	match = re.compile('<div id="(.+?)" class="item">\s+<style>.+<\/style>\s+<label for="(.+?)" id="(.+?)"><a style=\'font-family: Tahoma; color: #8D8D8D;\' class="active" href="(.+?)">(.+?)<\/a><\/label>\s+<\/div>').findall(codigo_fonte)
+	match += re.compile('<div id="(.+?)" class="item">\s+<label for="(.+?)" id="(.+?)"><a style=\'font-family: Tahoma; color: #8D8D8D;\' class="active" href="(.+?)">(.+?)<\/a><\/label>\s+<\/div>').findall(codigo_fonte)
 	
 	for lixo, lixo1, lixo2, link, nome in match:
 		addDir(nome.encode('utf-8'), url+link, 1, os.path.join(__ART_FOLDER__, __SKIN__, 'generos.png'), 1)
@@ -403,11 +407,11 @@ def getListOfMyAccount(url, pagina):
 
 	for link, imagem, nome, nome1 in match:
 		if 'filme.php' in link:
-			infoLabels = {'Title': nome.decode('iso-8859-1').encode('utf8') }
-			addVideo(nome.decode('iso-8859-1').encode('utf8'), __SITE__+link, 3, imagem, 'filme', 0, 0, infoLabels, imagem)
+			infoLabels = {'Title': nome.encode('utf8') }
+			addVideo(nome.encode('utf8'), __SITE__+link, 3, imagem, 'filme', 0, 0, infoLabels, imagem)
 		elif 'serie.php' in link:
-			infoLabels = {'Title': nome.decode('iso-8859-1').encode('utf8')}
-			addDir(nome.decode('iso-8859-1').encode('utf8'), __SITE__+link, 4, imagem, pagina, 'serie', infoLabels, imagem)
+			infoLabels = {'Title': nome.encode('utf8')}
+			addDir(nome.encode('utf8'), __SITE__+link, 4, imagem, pagina, 'serie', infoLabels, imagem)
 			
 	addDir('Proximo >>', __SITE__+tipo+'.php?pagina='+str(int(pagina)+1), 1, os.path.join(__ART_FOLDER__, __SKIN__, 'proximo.png'), int(pagina)+1)
 
