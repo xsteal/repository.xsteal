@@ -18,7 +18,7 @@
 
 
 
-import urllib,urllib2,re,xbmcplugin,xbmcgui,xbmcaddon,xbmc,os,json,threading,xbmcvfs,cookielib
+import urllib,urllib2,re,xbmcplugin,xbmcgui,xbmcaddon,xbmc,os,json,threading,xbmcvfs,cookielib,pprint
 from bs4 import BeautifulSoup
 from resources.lib import Downloader #Enen92 class
 from resources.lib import Player
@@ -133,34 +133,52 @@ def getList(url, pagina):
 		#filmes pt
 		#match = re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<div class="portugues"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Realizador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+?)<\/span>').findall(codigo_fonte)
 		#filmes pt com \n no plot
-		match = re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<div class="portugues"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Realizador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+\s+.+)<\/span>').findall(codigo_fonte)
+		#->match = re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<div class="portugues"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Realizador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+\s+.+)<\/span>').findall(codigo_fonte)
 		#filmes com \n no plot
-		match += re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Realizador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+\s+.+)<\/span>').findall(codigo_fonte)
+		#->match += re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Realizador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+\s+.+)<\/span>').findall(codigo_fonte)
 		#filmes normais
 		#match += re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Realizador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+?)<\/span>').findall(codigo_fonte)
+		
+		#sem plot
+		match = re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Realizador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+').findall(codigo_fonte)
+		match += re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<div class="portugues"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Realizador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+').findall(codigo_fonte)
+
+
 	elif tipo == 'series':
 		#series pt
 		#match = re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<div class="portugues"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Criador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+?)<\/span>').findall(codigo_fonte)
 		#series pt com \n no plot
-		match = re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<div class="portugues"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Criador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+\s+.+)<\/span>').findall('codigo_fonte')
+		#->match = re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<div class="portugues"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Criador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+\s+.+)<\/span>').findall('codigo_fonte')
 		#series com \n no plot
-		match += re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Criador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+\s+.+)<\/span>').findall(codigo_fonte)
+		#->match += re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Criador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+\s+.+)<\/span>').findall(codigo_fonte)
 		#series normais
 		#match += re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Criador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+?)<\/span>').findall(codigo_fonte)
 
+		match = re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<div class="portugues"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Criador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+').findall(codigo_fonte)
+		match += re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Criador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+').findall(codigo_fonte)
+	
+	
+	pprint.pprint(match)
 
-	for imagem, nome1, nome2, link, nome3, genero, ano, nomeOriginal, realizador, elenco, plot in match:
+	for imagem, nome1, nome2, link, nome3, genero, ano, nomeOriginal, realizador, elenco in match:
 		if tipo == 'filmes':
-			infoLabels = {'Title': nomeOriginal, 'Year': ano, 'Genre': genero, 'Plot': plot }
-			addVideo(nomeOriginal+' ('+ano+')', __SITE__+link, 3, imagem, 'filme', 0, 0, infoLabels, imagem)
+			try:
+				infoLabels = {'Title': nomeOriginal.encode('utf8'), 'Year': ano, 'Genre': genero.encode('utf8') }
+
+				addVideo(nomeOriginal+' ('+ano+')', __SITE__+link, 3, imagem, 'filme', 0, 0, infoLabels, imagem)
+			except:
+				pass
 		else:
-			infoLabels = {'Title':nomeOriginal, 'Aired':ano, 'Plot': plot}
-			addDir(nomeOriginal+ ' ('+ano+')', __SITE__+link, 4, imagem, pagina, 'serie', infoLabels, imagem)
+			try:
+				infoLabels = {'Title':nomeOriginal.encode('utf8'), 'Aired':ano}
+				addDir(nomeOriginal+ ' ('+ano+')', __SITE__+link, 4, imagem, pagina, 'serie', infoLabels, imagem)
+			except:
+				pass
 			
 	if categoria == '':
-		addDir('Proximo >>', __SITE__+tipo+'.php?pagina='+str(int(pagina)+1), 1, os.path.join(__ART_FOLDER__, __SKIN__, 'proximo.png'), int(pagina)+1)
+		addDir('Proximo', __SITE__+tipo+'.php?pagina='+str(int(pagina)+1), 1, os.path.join(__ART_FOLDER__, __SKIN__, 'proximo.png'), int(pagina)+1)
 	else:
-		addDir('Proximo >>', __SITE__+tipo+'.php?pagina='+str(int(pagina)+1)+'&categoria='+categoria, 1, os.path.join(__ART_FOLDER__, __SKIN__, 'proximo.png'), int(pagina)+1)
+		addDir('Proximo', __SITE__+tipo+'.php?pagina='+str(int(pagina)+1)+'&categoria='+categoria, 1, os.path.join(__ART_FOLDER__, __SKIN__, 'proximo.png'), int(pagina)+1)
 
 	vista_filmesSeries()
 
@@ -201,14 +219,14 @@ def getEpisodes(url):
 
 	for lixo, lixo1, link, lixo2, imagem, imagemExterna, nome, episodioNumero in match:
 		imdb = re.compile('imdb=(.+?)&').findall(link)[0]
-		infoLabels = {'Title':nome.decode('iso-8859-1').encode('utf8'), 'Actors':actors.decode('iso-8859-1').encode('utf8'), 'Plot':plot.decode('iso-8859-1').encode('utf8'), 'Season':temporadaNumero, 'Episode':episodioNumero, 'Writer': criador, "Code":imdb }
+		infoLabels = {'Title':nome, 'Actors':actors, 'Plot':plot, 'Season':temporadaNumero, 'Episode':episodioNumero, 'Writer': criador, "Code":imdb }
 		
 		if 'e' in episodioNumero:
 			episodioNumeroReal = re.compile('(.+)e').findall(episodioNumero)[0]
 		else:
 			episodioNumeroReal = episodioNumero
 
-		addVideo('[B]Episodio '+episodioNumero+'[/B] | '+nome.decode('iso-8859-1').encode('utf8'), __SITE__+link, 3, __SITE__+imagem, 'episodio', temporadaNumero, episodioNumeroReal, infoLabels, imagemExterna, serieTitulo)
+		addVideo('[B]Episodio '+episodioNumero+'[/B] | '+nome, __SITE__+link, 3, __SITE__+imagem, 'episodio', temporadaNumero, episodioNumeroReal, infoLabels, imagemExterna, serieTitulo)
 
 	arrow = re.compile('<div id="slide-right-arrow" class="right-arrow"><a href=\'(.+?)\'><\/a><\/div>').findall(codigo_fonte)
 
@@ -313,11 +331,17 @@ def pesquisa():
 
 			for imagem, nome1, nome2, link, nome3, genero, ano, nomeOriginal, realizador, elenco, plot in match:
 				if server == 0:
-					infoLabels = {'Title': nomeOriginal, 'Year': ano, 'Genre': genero, 'Plot': plot }
-					addVideo(nomeOriginal+' ('+ano+')', __SITE__+link, 3, imagem, 'filme', 0, 0, infoLabels, imagem)
+					try:
+						infoLabels = {'Title': nomeOriginal, 'Year': ano, 'Genre': genero, 'Plot': plot }
+						addVideo(nomeOriginal+' ('+ano+')', __SITE__+link, 3, imagem, 'filme', 0, 0, infoLabels, imagem)
+					except:
+						pass
 				elif server == 1:
-					infoLabels = {'Title':nomeOriginal, 'Aired':ano, 'Plot': plot}
-					addDir(nomeOriginal+ ' ('+ano+')', __SITE__+link, 4, imagem, pagina, 'serie', infoLabels, imagem)
+					try:
+						infoLabels = {'Title':nomeOriginal, 'Aired':ano, 'Plot': plot}
+						addDir(nomeOriginal+ ' ('+ano+')', __SITE__+link, 4, imagem, pagina, 'serie', infoLabels, imagem)
+					except:
+						pass
 		else:
 			addDir('Voltar', 'url', None, os.path.join(__ART_FOLDER__, __SKIN__, 'retroceder.png'), 0)	
 
@@ -413,7 +437,7 @@ def getListOfMyAccount(url, pagina):
 			infoLabels = {'Title': nome.encode('utf8')}
 			addDir(nome.encode('utf8'), __SITE__+link, 4, imagem, pagina, 'serie', infoLabels, imagem)
 			
-	addDir('Proximo >>', __SITE__+tipo+'.php?pagina='+str(int(pagina)+1), 1, os.path.join(__ART_FOLDER__, __SKIN__, 'proximo.png'), int(pagina)+1)
+	addDir('Proximo', __SITE__+tipo+'.php?pagina='+str(int(pagina)+1), 1, os.path.join(__ART_FOLDER__, __SKIN__, 'proximo.png'), int(pagina)+1)
 
 	vista_filmesSeries()
 

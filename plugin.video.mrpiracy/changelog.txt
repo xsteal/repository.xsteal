@@ -1,3 +1,6 @@
+v0.0.4 (05/11/2015)
+- Erros de encoding no nome dos filmes/series! - #Resolvido com try/catch, provavelmente nao aparece o filme/serie
+
 v0.0.3 (01/11/2015)
 - Erros de encoding resolvidos!! - #UPDATE FORÇADO!
 
