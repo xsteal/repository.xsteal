@@ -1,3 +1,6 @@
+v0.0.5 (17/11/2015)
+- Novas alterações no site corrigidas!
+
 v0.0.4 (05/11/2015)
 - Erros de encoding no nome dos filmes/series! - #Resolvido com try/catch, provavelmente nao aparece o filme/serie
 
