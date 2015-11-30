@@ -1,3 +1,6 @@
+v0.0.6 (20/11/2015)
+- Alterações do site corrigidas no addon!
+
 v0.0.5 (17/11/2015)
 - Novas alterações no site corrigidas!
 

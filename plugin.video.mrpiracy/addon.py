@@ -42,7 +42,7 @@ __SITE__ = 'http://kodi.mrpiracy.xyz/'
 
 __ALERTA__ = xbmcgui.Dialog().ok
 
-__COOKIE_FILE__ = os.path.join(xbmc.translatePath('special://userdata/addon_data/plugin.video.mrpiracy/').decode('utf-8'), 'cookie.mrpiracy')
+__COOKIE_FILE__ = os.path.join(xbmc.translatePath('special://userdata/addon_data/plugin.video.mrpiracy/'), 'cookie.mrpiracy')
 __HEADERS__ = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:43.0) Gecko/20100101 Firefox/43.0', 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7'}
 
 
@@ -162,7 +162,7 @@ def getList(url, pagina):
         match = re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Criador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+?)<\/span>').findall(codigo_fonte)
         match += re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<div class="portugues"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Criador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+\s+.+)<\/span>').findall(codigo_fonte)
 
-    pprint.pprint(match)
+    #pprint.pprint(match)
 
     for imagem, nome1, nome2, link, nome3, genero, ano, nomeOriginal, realizador, elenco, plot in match:
         if tipo == 'filmes':
@@ -211,7 +211,8 @@ def getEpisodes(url):
     codigo_fonte = net.http_GET(url, headers=__HEADERS__).content
 
     #match = re.compile('<div id="(.+?)" class="item">\s+<div class="thumb(.+?)">\s+<a href="(.+?)">\s+<img style="(.+?)" src="(.+?)" onError="this.onerror=null;this.src=\'(.+?)\';" alt="(.+?)">\s+<div class="thumb-shadow"><\/div>\s+<div class="visto" style="background-size: 110px;"><\/div>\s+<div class="thumb-effect"><\/div>\s+<div class="episode-number">(.+?)<\/div>').findall(codigo_fonte)
-    match = re.compile('<div id="(.+?)" class="item">\s+<div class="thumb(.+?)">\s+<a href="(.+?)">\s+<img style="(.+?)" src="(.+?)" onError="this.onerror=null;this.src=\'(.+?)\';" alt="(.+?)">\s+<div class="thumb-shadow"><\/div>\s+<div class="thumb-effect"><\/div>\s+<div class="episode-number">(.+?)<\/div>').findall(codigo_fonte)
+    #match = re.compile('<div id="(.+?)" class="item">\s+<div class="thumb(.+?)">\s+<a href="(.+?)">\s+<img style="(.+?)" src="(.+?)" onError="this.onerror=null;this.src=\'(.+?)\';" alt="(.+?)">\s+<div class="thumb-shadow"><\/div>\s+<div class="thumb-effect"><\/div>\s+<div class="episode-number">(.+?)<\/div>').findall(codigo_fonte)
+    match = re.compile('<div id="(.+?)" class="item">\s+<div class="thumb(.+?)?">\s+<a name=\'.+?\' href="(.+?)">\s+<img style="(.+?)" src="(.+?)" onError="this\.onerror=null;this\.src=\'(.+?)\';" alt="(.+?)">\s+<div class="thumb-shadow"><\/div>\s+<div class="thumb-effect"><\/div>\s+<div class="episode-number">(.+?)<\/div>').findall(codigo_fonte)
 
     temporadaNumero = re.compile('<div class="season"><a href="(.+?)" class="slctd">(.+?)</a></div>').findall(codigo_fonte)[0][1]
     actors = re.compile('<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>').findall(codigo_fonte)[0]
@@ -232,13 +233,13 @@ def getEpisodes(url):
 
         addVideo('[B]Episodio '+episodioNumero+'[/B] | '+nome, __SITE__+link, 3, __SITE__+imagem, 'episodio', temporadaNumero, episodioNumeroReal, infoLabels, imagemExterna, serieTitulo)
 
-    arrow = re.compile('<div id="slide-right-arrow" class="right-arrow"><a href=\'(.+?)\'><\/a><\/div>').findall(codigo_fonte)
+    """arrow = re.compile('<div id="slide-right-arrow" class="right-arrow"><a href=\'(.+?)\'><\/a><\/div>').findall(codigo_fonte)
 
     if arrow != []:
         for more in arrow:
             getEpisodes(__SITE__+more)
 
-
+    """
 
     vista_episodios()
 
@@ -249,43 +250,50 @@ def getStreamLegenda(match, siteBase, codigo_fonte):
 
     net = Net()
 
+    pprint.pprint(match)
+
     if match != []:
+
+        servidores = re.compile('document\.getElementById\(\"banner-box box-header servidores\"\)\.innerHTML = \'(.+?)\'\;').findall(codigo_fonte)
+
+        pprint.pprint(servidores)
 
         dialog = xbmcgui.Dialog()
         servidor = ''
         if len(match) == 1:
             servidor = dialog.select(u'Escolha o servidor', ['Servidor #1', 'Servidor #2'])
-        elif len(match) == 2:
+        """elif len(match) == 2:
             servidor = dialog.select(u'Escolha o servidor', ['Servidor #1', 'Servidor #2', 'Servidor #3'])
         elif len(match) == 3:
             servidor = dialog.select(u'Escolha o servidor', ['Servidor #1', 'Servidor #2', 'Servidor #3'])
-        """elif len(match) == 4:
+        elif len(match) == 4:
             servidor = dialog.select(u'Escolha o servidor', ['Servidor #1', 'Servidor #2', 'Servidor #3', 'Servidor #4', 'Servidor #5'])"""
 
         if servidor == 0:
-            linkOpenload = re.compile('<iframe src="(.+?)" scrolling="no"').findall(codigo_fonte)[0]
+            linkOpenload = re.compile('<iframe id="reprodutor" src="(.+?)" scrolling="no"').findall(codigo_fonte)[0]
             stream = URLResolverMedia.OpenLoad(linkOpenload).getMediaUrl()      
             legenda = URLResolverMedia.OpenLoad(linkOpenload).getSubtitle()
             
-        elif servidor == 1:
-            servidorVideoMega = net.http_GET(__SITE__+siteBase+str(match[0][0]), headers=__HEADERS__).content
-            linkVideoMega = re.compile('<iframe src="(.+?)" scrolling="no"').findall(servidorVideoMega)[0]
-
+        elif servidor == 3:
+            linkVideoMega = re.compile('<iframe id="reprodutor" src="(.+?)" scrolling="no"').findall(servidores[1])[0]
             stream = URLResolverMedia.VideoMega(linkVideoMega).getMediaUrl()
-            linkOpenload = re.compile('<iframe src="(.+?)" scrolling="no"').findall(codigo_fonte)[0]
+            linkOpenload = re.compile('<iframe id="reprodutor" src="(.+?)" scrolling="no"').findall(codigo_fonte)[0]
             legenda = URLResolverMedia.OpenLoad(linkOpenload).getSubtitle()
             
-        elif servidor == 2:
-            servidorVidzi = net.http_GET(__SITE__+siteBase+str(match[1][0]), headers=__HEADERS__).content
-            linkVidzi = re.compile('<iframe src="(.+?)" scrolling="no"').findall(servidorVidzi)[0]
+        elif servidor == 1:
+            linkVidzi = re.compile('<iframe id="reprodutor" src="(.+?)" scrolling="no"').findall(servidores[2])[0]
             vidzi = URLResolverMedia.Vidzi(linkVidzi)
-
             stream = vidzi.getMediaUrl()
             legenda = vidzi.getSubtitle()
 
 
     else:
-        linkOpenload = re.compile('<iframe src="(.+?)" scrolling="no"').findall(codigo_fonte)[0]
+
+        if 'serie' in siteBase:
+            linkOpenload = re.compile('<iframe src="(.+?)" scrolling="no"').findall(codigo_fonte)[0]
+        else:
+            linkOpenload = re.compile('<iframe id="reprodutor" src="(.+?)" scrolling="no"').findall(codigo_fonte)[0]
+        
         stream = URLResolverMedia.OpenLoad(linkOpenload).getMediaUrl()      
         legenda = URLResolverMedia.OpenLoad(linkOpenload).getSubtitle()
         
@@ -325,9 +333,9 @@ def pesquisa():
             #filmes pt
             #match = re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<div class="portugues"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Realizador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="movie-actions" style="display: none;">\s+<a id="watched" href="javascript\: movieUserAction\(\'movies\', 7339, \'watched\'\)\;" class="">Marcar como visto<span class="watch"><\/span><\/a><br>\s+<a id="cliped" href="javascript\: movieUserAction\(\'movies\', 7339, \'cliped\'\)\;" class="">Agendar para ver mais tarde<span class="clip"><\/span><\/a><br>\s+<a id="faved" href="javascript\: movieUserAction\(\'movies\', 7339, \'faved\'\)\;" class="">Adicionar este filme aos favoritos<span class="fave"><\/span><\/a>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+?)<\/span>').findall(codigo_fonte)
             #filmes pt com \n no plot
-            match = re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<div class="portugues"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Realizador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="movie-actions" style="display: none;">\s+<a id="watched" href="javascript\: movieUserAction\(\'movies\', 7339, \'watched\'\)\;" class="">Marcar como visto<span class="watch"><\/span><\/a><br>\s+<a id="cliped" href="javascript\: movieUserAction\(\'movies\', 7339, \'cliped\'\)\;" class="">Agendar para ver mais tarde<span class="clip"><\/span><\/a><br>\s+<a id="faved" href="javascript\: movieUserAction\(\'movies\', 7339, \'faved\'\)\;" class="">Adicionar este filme aos favoritos<span class="fave"><\/span><\/a>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+\s+.+)<\/span>').findall(codigo_fonte)
+            match = re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<div class="portugues"></div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info" style="width: 800px;">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info" style="width: inherit;">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Realizador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="movie-actions" style="display: none;">\s+<a id="watched" href="javascript\: movieUserAction\(\'movies\', 7339, \'watched\'\)\;" class="">Marcar como visto<span class="watch"><\/span><\/a><br>\s+<a id="cliped" href="javascript\: movieUserAction\(\'movies\', 7339, \'cliped\'\)\;" class="">Agendar para ver mais tarde<span class="clip"><\/span><\/a><br>\s+<a id="faved" href="javascript\: movieUserAction\(\'movies\', 7339, \'faved\'\)\;" class="">Adicionar este filme aos favoritos<span class="fave"><\/span><\/a>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+\s+.+)<\/span>').findall(codigo_fonte)
             #filmes com \n no plot
-            match += re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Realizador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="movie-actions" style="display: none;">\s+<a id="watched" href="javascript\: movieUserAction\(\'movies\', 7339, \'watched\'\)\;" class="">Marcar como visto<span class="watch"><\/span><\/a><br>\s+<a id="cliped" href="javascript\: movieUserAction\(\'movies\', 7339, \'cliped\'\)\;" class="">Agendar para ver mais tarde<span class="clip"><\/span><\/a><br>\s+<a id="faved" href="javascript\: movieUserAction\(\'movies\', 7339, \'faved\'\)\;" class="">Adicionar este filme aos favoritos<span class="fave"><\/span><\/a>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+\s+.+)<\/span>').findall(codigo_fonte)
+            match += re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info" style="width: 800px;">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info" style="width: inherit;">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Realizador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="movie-actions" style="display: none;">\s+<a id="watched" href="javascript\: movieUserAction\(\'movies\', 7339, \'watched\'\)\;" class="">Marcar como visto<span class="watch"><\/span><\/a><br>\s+<a id="cliped" href="javascript\: movieUserAction\(\'movies\', 7339, \'cliped\'\)\;" class="">Agendar para ver mais tarde<span class="clip"><\/span><\/a><br>\s+<a id="faved" href="javascript\: movieUserAction\(\'movies\', 7339, \'faved\'\)\;" class="">Adicionar este filme aos favoritos<span class="fave"><\/span><\/a>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+\s+.+)<\/span>').findall(codigo_fonte)
             #filmes normais
             #match += re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Realizador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="movie-actions" style="display: none;">\s+<a id="watched" href="javascript\: movieUserAction\(\'movies\', 7339, \'watched\'\)\;" class="">Marcar como visto<span class="watch"><\/span><\/a><br>\s+<a id="cliped" href="javascript\: movieUserAction\(\'movies\', 7339, \'cliped\'\)\;" class="">Agendar para ver mais tarde<span class="clip"><\/span><\/a><br>\s+<a id="faved" href="javascript\: movieUserAction\(\'movies\', 7339, \'faved\'\)\;" class="">Adicionar este filme aos favoritos<span class="fave"><\/span><\/a>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+?)<\/span>').findall(codigo_fonte)
 
@@ -613,7 +621,7 @@ def player(name,url,iconimage,temporada,episodio,serieNome=''):
     net.set_cookies(__COOKIE_FILE__)
     codigo_fonte = net.http_GET(url, headers=__HEADERS__).content
 
-    match = re.compile('<a class="btn" href="(.+?)"><img src="(.+?)"><\/a>').findall(codigo_fonte)
+    match = re.compile('<a id="(.+?)" class="btn(.+?)?" onclick=".+?"><img src="(.+?)"><\/a>').findall(codigo_fonte)
 
     stream, legenda = getStreamLegenda(match, siteBase, codigo_fonte)
 
