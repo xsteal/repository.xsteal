@@ -164,7 +164,7 @@ def getList(url, pagina):
         match = re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Criador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+?)<\/span>').findall(codigo_fonte)
         match += re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<div class="portugues"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Criador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+\s+.+)<\/span>').findall(codigo_fonte)
 
-    pprint.pprint(match)
+    #pprint.pprint(match)
 
     
     if tipo == 'filmes':
@@ -218,9 +218,9 @@ def getEpisodes(url):
 
     #match = re.compile('<div id="(.+?)" class="item">\s+<div class="thumb(.+?)">\s+<a href="(.+?)">\s+<img style="(.+?)" src="(.+?)" onError="this.onerror=null;this.src=\'(.+?)\';" alt="(.+?)">\s+<div class="thumb-shadow"><\/div>\s+<div class="visto" style="background-size: 110px;"><\/div>\s+<div class="thumb-effect"><\/div>\s+<div class="episode-number">(.+?)<\/div>').findall(codigo_fonte)
     #match = re.compile('<div id="(.+?)" class="item">\s+<div class="thumb(.+?)">\s+<a href="(.+?)">\s+<img style="(.+?)" src="(.+?)" onError="this.onerror=null;this.src=\'(.+?)\';" alt="(.+?)">\s+<div class="thumb-shadow"><\/div>\s+<div class="thumb-effect"><\/div>\s+<div class="episode-number">(.+?)<\/div>').findall(codigo_fonte)
-    match = re.compile('<div id="(.+?)" class="item">\s+<div class="thumb(.+?)?">\s+<a name=\'.+?\' href="(.+?)">\s+<img style="(.+?)" src="(.+?)" onError="this\.onerror=null;this\.src=\'(.+?)\';" alt="(.+?)">\s+<div class="thumb-shadow" alt="(.+?)"><\/div>\s+<div class="thumb-effect" alt="(.+?)"><\/div>\s+<div class="episode-number">(.+?)<\/div>').findall(codigo_fonte)
+    match = re.compile('<div id="(.+?)" class="item">\s+<div class="thumb(.+?)?">\s+<a name=\'.+?\' href="(.+?)">\s+<img style="(.+?)" src="(.+?)" onError="this\.onerror=null;this\.src=\'(.+?)\';"\s+alt="(.+?)?">\s+<div class="thumb-shadow" alt="(.+?)?"><\/div>\s+<div class="thumb-effect" alt="(.+?)?"><\/div>\s+<div class="episode-number">(.+?)<\/div>').findall(codigo_fonte)
 
-    temporadaNumero = re.compile('<div class="season"><a href="(.+?)" class="slctd">(.+?)</a></div>').findall(codigo_fonte)[0][1]
+    temporadaNumero = re.compile('<div\s+class="season"><a\s+href="(.+?)"\s+class="slctd">(.+?)<\/a>').findall(codigo_fonte)[0][1]
     actors = re.compile('<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>').findall(codigo_fonte)[0]
     plot = re.compile(u'Descrição:<\/span>(.+\s.+)<\/span>\s+<\/div>').findall(codigo_fonte)[0]
 
@@ -263,7 +263,7 @@ def getStreamLegenda(match, siteBase, codigo_fonte):
         servidores = re.compile('document\.getElementById\(\"banner-box box-header servidores\"\)\.innerHTML = \'(.+?)\'\;').findall(codigo_fonte)
 
 
-        pprint.pprint(servidores)
+        #pprint.pprint(servidores)
 
         dialog = xbmcgui.Dialog()
         servidor = ''
@@ -350,7 +350,7 @@ def pesquisa():
             #filmes normais
             #match += re.compile('<img src="(.+?)" alt="(.+?)">\s+<div class="thumb-effect" title="(.+?)"><\/div>\s+<\/a>\s+<\/div>\s+<\/div>\s+<div class="movie-info">\s+<a href="(.+?)" class="movie-name">(.+?)<\/a>\s+<div class="clear"><\/div>\s+<div class="movie-detailed-info">\s+<div class="detailed-aux" style="height\: 20px\; line-height\: 20px\;">\s+<span class="genre">(.+?)<\/span>\s+<span class="year">\s+<span>\(<\/span>(.+?)<span>\)<\/span><\/span>\s+<span class="original-name">\s+-\s+"(.+?)"<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Realizador:\s+<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<div class="detailed-aux">\s+<span class="director-caption">Elenco:<\/span>\s+<span class="director">(.+?)<\/span>\s+<\/div>\s+<\/div>\s+<div class="movie-actions" style="display: none;">\s+<a id="watched" href="javascript\: movieUserAction\(\'movies\', 7339, \'watched\'\)\;" class="">Marcar como visto<span class="watch"><\/span><\/a><br>\s+<a id="cliped" href="javascript\: movieUserAction\(\'movies\', 7339, \'cliped\'\)\;" class="">Agendar para ver mais tarde<span class="clip"><\/span><\/a><br>\s+<a id="faved" href="javascript\: movieUserAction\(\'movies\', 7339, \'faved\'\)\;" class="">Adicionar este filme aos favoritos<span class="fave"><\/span><\/a>\s+<\/div>\s+<div class="clear"><\/div>\s+<br><div class="clear"><\/div>\s+<span id="movie-synopsis" class="movie-synopsis">(.+?)<\/span>').findall(codigo_fonte)
 
-        pprint.pprint(match)
+        #pprint.pprint(match)
 
         if match != []:
 
