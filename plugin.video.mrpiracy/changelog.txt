@@ -1,3 +1,8 @@
+v0.1.0 (24/01/2016)
+- Alterações nas séries, lista as temproadas e episódios!
+- Novos links internos
+- Imagem de pesquisa
+
 v0.0.9 (03/01/2016)
 - Alterações nas séries, lista as temproadas e episódios!
 
