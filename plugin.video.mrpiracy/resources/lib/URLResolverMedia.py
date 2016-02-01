@@ -100,8 +100,8 @@ class OpenLoad():
 	def getSubtitle(self):
 		pageOpenLoad = self.net.http_GET(self.url, headers=self.headers).content
 		subtitle = re.compile('<track kind="captions" src="(.+?)" srclang="pt" label="Portuguese" default>').findall(pageOpenLoad)[0]
-		return self.site + subtitle
-
+		#return self.site + subtitle
+		return subtitle
 
 
 class VideoMega():

@@ -197,7 +197,8 @@ def getSeasons(url):
     net = Net()
     codigo_fonte = net.http_GET(url, headers=__HEADERS__).content
 
-    match = re.compile('<div class="season"><a href="(.+?)" .+?>(.+?)<\/a><\/div>').findall(codigo_fonte)
+    #match = re.compile('<div class="season"><a href="(.+?)".+?>(.+?)<\/a><\/div>').findall(codigo_fonte)
+    match = re.compile('<div class="season"><a href="(.+?)">(.+?)<\/a><\/div>').findall(codigo_fonte)
 
     for link, temporada in match:
         addDirSeason("[B]Temporada[/B] "+temporada, __SITE__+"kodi_"+link, 5, os.path.join(__ART_FOLDER__, __SKIN__, 'temporadas', 'temporada'+temporada+'.png'), 1, temporada)

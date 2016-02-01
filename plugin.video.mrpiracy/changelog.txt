@@ -1,3 +1,7 @@
+v0.1.1 (01/02/2016)
+- Alteração de número de temporadas, novamente aparecem todas as temporadas.
+- Correção de legenda com o servidor OpenLoad
+
 v0.1.0 (24/01/2016)
 - Alterações nas séries, lista as temproadas e episódios!
 - Novos links internos
