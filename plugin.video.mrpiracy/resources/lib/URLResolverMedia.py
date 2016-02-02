@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
+
 
 # Copyright 2015 xsteal
 #
@@ -16,9 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import json, re, xbmc, urllib, xbmcgui
+import json, re, xbmc, urllib, xbmcgui, os, sys, pprint
 from t0mm0.common.net import Net
+from bs4 import BeautifulSoup
 import jsunpacker
+import AADecoder
+
 
 class OpenLoad():
 
@@ -28,7 +31,7 @@ class OpenLoad():
 		self.id = str(self.getId())
 		self.messageOk = xbmcgui.Dialog().ok
 		self.site = 'https://openload.co'
-		self.headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:43.0) Gecko/20100101 Firefox/43.0', 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7'}
+		self.headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:43.0) Gecko/20100101 Firefox/43.0', 'Accept-Charset': 'utf-8;q=0.7,*;q=0.7'}
 
 
 	def getId(self):
@@ -36,6 +39,31 @@ class OpenLoad():
 		return re.compile('https\:\/\/openload\.co\/embed\/(.+?)\/').findall(self.url)[0]
 
 	def getMediaUrl(self):
+
+		content = self.net.http_GET(self.url, headers=self.headers).content
+
+		"""soup = BeautifulSoup(content)
+
+		scriptResults = soup.find_all('script')
+		
+		video_url1 = ''
+
+		for script in scriptResults:
+			aadecoded = AADecoder.AADecoder(str(script.encode('utf-8')))
+			if aadecoded.is_aaencoded():
+				video_url = aadecoded.decode()
+
+		print video_url1"""
+
+		aascript = re.compile('<script type="text\/javascript">(.+?)<\/script>').findall(content)
+		pprint.pprint(aascript)
+		string = AADecoder.AADecoder(str(aascript[1].encode('utf-8'))).decode()
+		video_url = string.replace('window.vr ="','',1).replace('";window.vt ="video/mp4" ;','',1)
+
+		print video_url
+		return video_url
+
+	def getMediaUrlOld(self):
 
 		try:
 			ticket = 'https://api.openload.co/1/file/dlticket?file=%s' % self.id
@@ -54,9 +82,6 @@ class OpenLoad():
 				if captcha:
 					captchaResponse = self.getCaptcha(captcha.replace('\/', '/'))
 
-					print "CAPTCHA RESPONSE"
-					print captchaResponse
-
 					if captchaResponse:
 						fileUrl += '&captcha_response=%s' % urllib.quote(captchaResponse)
 
@@ -71,7 +96,9 @@ class OpenLoad():
 					self.messageOk('MrPiracy.xyz', "FILE: "+jsonResult['msg'])
 
 			else:
+
 				self.messageOk('MrPiracy.xyz', "TICKET: "+jsonResult['msg'])
+				return False
 		except:
 			self.messageOk('MrPiracy.xyz', 'Ocorreu um erro a obter o link. Escolha outro servidor.')
 
@@ -128,7 +155,7 @@ class VideoMega():
 		if match:
 			return match.group(1) + '|User-Agent=%s' % (self.headers)
 		else:
-			self.messageOk('MrPiracy.xyz', 'Video não encontrado.')
+			self.messageOk('MrPiracy.xyz', 'Video nao encontrado.')
 
 class Vidzi():
 	def __init__(self, url):
@@ -159,13 +186,13 @@ class Vidzi():
 			for pack in re.finditer('(eval\(function.*?)</script>', sourceCode, re.DOTALL):
 				dataJs = jsunpacker.unpack(pack.group(1)) # Unpacker for Dean Edward's p.a.c.k.e.r | THKS
 				stream = re.search('file\s*:\s*"([^"]+)', dataJs)
-				subtitle = re.compile('tracks:\[\{file:"(.+?)\.srt"').findall(dataJs)[0]
+				subtitle = re.compile('tracks: \[\{ file: "(.+?)\.srt"').findall(dataJs)[0]
 				subtitle += ".srt"
 				self.subtitle = subtitle
 				if stream:
 					return stream.group(1)
 
-		self.messageOk('MrPiracy.xyz', 'Video nao encontrado. Escolha outro servidro')
+		self.messageOk('MrPiracy.xyz', 'Video nao encontrado. Escolha outro servidor')
 
 
 	def getSubtitle(self):

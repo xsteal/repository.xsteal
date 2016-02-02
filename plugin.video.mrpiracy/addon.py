@@ -200,7 +200,12 @@ def getSeasons(url):
     #match = re.compile('<div class="season"><a href="(.+?)".+?>(.+?)<\/a><\/div>').findall(codigo_fonte)
     match = re.compile('<div class="season"><a href="(.+?)">(.+?)<\/a><\/div>').findall(codigo_fonte)
 
+
     for link, temporada in match:
+
+        if '" class="slctd' in link:
+            link = re.compile('(.+?)" class="slctd').findall(link)[0]
+
         addDirSeason("[B]Temporada[/B] "+temporada, __SITE__+"kodi_"+link, 5, os.path.join(__ART_FOLDER__, __SKIN__, 'temporadas', 'temporada'+temporada+'.png'), 1, temporada)
 
     vista_temporadas()
@@ -254,6 +259,8 @@ def getStreamLegenda(match, siteBase, codigo_fonte):
     net = Net()
 
     
+    dialog = xbmcgui.Dialog()
+    servidor = ''
 
     if match != []:
 
@@ -262,10 +269,9 @@ def getStreamLegenda(match, siteBase, codigo_fonte):
 
         #pprint.pprint(servidores)
 
-        dialog = xbmcgui.Dialog()
-        servidor = ''
+        
         #if len(match) == 1:
-        servidor = dialog.select(u'Escolha o servidor', ['OpenLoad', 'VidZi'])
+        servidor = dialog.select(u'Escolha o servidor', ['OpenLoad', 'VidZi', 'Antigo OpenLoad'])
         """elif len(match) == 2:
             servidor = dialog.select(u'Escolha o servidor', ['Servidor #1', 'Servidor #2', 'Servidor #3'])
         elif len(match) == 3:
@@ -288,8 +294,14 @@ def getStreamLegenda(match, siteBase, codigo_fonte):
             linkVidzi = re.compile('<iframe id="reprodutor" src="(.+?)" scrolling="no"').findall(servidores[2])[0]
             vidzi = URLResolverMedia.Vidzi(linkVidzi)
             stream = vidzi.getMediaUrl()
-            legenda = vidzi.getSubtitle()
-
+            #legenda = vidzi.getSubtitle()
+            linkOpenload = re.compile('<iframe id="reprodutor" src="(.+?)" scrolling="no"').findall(codigo_fonte)[0]
+            legenda = URLResolverMedia.OpenLoad(linkOpenload).getSubtitle()
+        
+        elif servidor == 2:
+            linkOpenload = re.compile('<iframe id="reprodutor" src="(.+?)" scrolling="no"').findall(codigo_fonte)[0]
+            stream = URLResolverMedia.OpenLoad(linkOpenload).getMediaUrlOld()      
+            legenda = URLResolverMedia.OpenLoad(linkOpenload).getSubtitle()
 
     else:
 
@@ -298,12 +310,16 @@ def getStreamLegenda(match, siteBase, codigo_fonte):
         else:
             linkOpenload = re.compile('<iframe id="reprodutor" src="(.+?)" scrolling="no"').findall(codigo_fonte)[0]
         
-        print "ELSE"
-        print linkOpenload
+        servidor = dialog.select(u'Escolha o servidor', ['OpenLoad', 'Antigo OpenLoad'])
 
-        stream = URLResolverMedia.OpenLoad(linkOpenload).getMediaUrl()      
-        legenda = URLResolverMedia.OpenLoad(linkOpenload).getSubtitle()
-        
+        if servidor == 0:
+            stream = URLResolverMedia.OpenLoad(linkOpenload).getMediaUrl()      
+            legenda = URLResolverMedia.OpenLoad(linkOpenload).getSubtitle()
+        elif servidor == 1:
+            stream = URLResolverMedia.OpenLoad(linkOpenload).getMediaUrlOld()      
+            legenda = URLResolverMedia.OpenLoad(linkOpenload).getSubtitle()
+           
+
 
     return stream, legenda
 
@@ -660,16 +676,19 @@ def player(name,url,iconimage,temporada,episodio,serieNome=''):
     xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]), succeeded=True, listitem=listitem)
     
     mensagemprogresso.update(75, "", u'Boa Sessão!!!', "")
-    print "url: "+url+" idIMDb: "+idIMDb+" pastaData: "+pastaData+"\n temporada: "+str(temporada)+" episodio: "+str(episodio)+" \nnome: "+name+" ano:"+str(ano)+"\nstram: "+stream+" legenda: "+legenda 
+    print "url: "+url+" idIMDb: "+idIMDb+" pastaData: "+pastaData+"\n temporada: "+str(temporada)+" episodio: "+str(episodio)+" \nnome: "+name+" ano:"+str(ano)+"\nstream: "+stream+" legenda: "+legenda 
 
-    player = Player.Player(url=url, idFilme=idIMDb, pastaData=pastaData, temporada=temporada, episodio=episodio, nome=name, ano=ano, logo=os.path.join(__ADDON_FOLDER__,'icon.png'), serieNome=serieNome)
-    mensagemprogresso.close()
-    player.play(playlist)
-    player.setSubtitles(legenda)
+    if stream == False:
+        __ALERTA__('MrPiracy.xyz', 'O servidor escolhido não disponível, escolha outro ou tente novamente mais tarde.')
+    else:
+        player = Player.Player(url=url, idFilme=idIMDb, pastaData=pastaData, temporada=temporada, episodio=episodio, nome=name, ano=ano, logo=os.path.join(__ADDON_FOLDER__,'icon.png'), serieNome=serieNome)
+        mensagemprogresso.close()
+        player.play(playlist)
+        player.setSubtitles(legenda)
 
-    while player.playing:
-        xbmc.sleep(5000)
-        player.trackerTempo()
+        while player.playing:
+            xbmc.sleep(5000)
+            player.trackerTempo()
 
 
 ########################################################################################################
