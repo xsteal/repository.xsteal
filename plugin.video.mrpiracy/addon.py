@@ -200,6 +200,7 @@ def getSeasons(url):
 
     #match = re.compile('<div class="season"><a href="(.+?)".+?>(.+?)<\/a><\/div>').findall(codigo_fonte)
     match = re.compile('<div class="season"><a href="(.+?)">(.+?)<\/a><\/div>').findall(codigo_fonte)
+    match += re.compile('<div class="season"><a href="(.+?)" >(.+?)<\/a><\/div>').findall(codigo_fonte)
 
 
     for link, temporada in match:
