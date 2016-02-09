@@ -43,7 +43,7 @@ __SITE__ = 'http://kodi.mrpiracy.xyz/'
 __ALERTA__ = xbmcgui.Dialog().ok
 
 __COOKIE_FILE__ = os.path.join(xbmc.translatePath('special://userdata/addon_data/plugin.video.mrpiracy/'), 'cookie.mrpiracy')
-__HEADERS__ = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:43.0) Gecko/20100101 Firefox/43.0', 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7'}
+__HEADERS__ = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:43.0) Gecko/20100101 Firefox/43.0', 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7'} #ISO-8859-1,
 
 
 def menu():
@@ -83,13 +83,14 @@ def login():
         try:
 
             net = Net()
-            net.set_cookies(__COOKIE_FILE__)
 
             dados = {'email': __ADDON__.getSetting("email"), 'password': __ADDON__.getSetting("password"), 'lembrar_senha': 'lembrar'}
             
-            codigo_fonte = net.http_POST(__SITE__+'kodi.login_bd.php',form_data=dados,headers=__HEADERS__).content
+            codigo_fonte = net.http_POST(__SITE__+'login_bd.php',form_data=dados,headers=__HEADERS__).content.encode('utf-8')
 
             match = re.compile('class="myAccount">(.+?)<\/a>').findall(codigo_fonte)
+
+            print codigo_fonte
 
         except:
             resultado = False
