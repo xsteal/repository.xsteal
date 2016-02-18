@@ -1,5 +1,5 @@
 #!/usr/bin/python
-
+# -*- coding: utf-8 -*-
 
 # Copyright 2015 xsteal
 #
@@ -38,9 +38,58 @@ class OpenLoad():
 		#return self.url.split('/')[-1]
 		return re.compile('https\:\/\/openload\.co\/embed\/(.+?)\/').findall(self.url)[0]
 
+	def decodeOpenLoad(self, html):
+		aastring = re.search(r"<video(?:.|\s)*?<script\s[^>]*?>((?:.|\s)*?)</script", html, re.DOTALL | re.IGNORECASE).group(1)
+		aastring = aastring.replace("((ﾟｰﾟ) + (ﾟｰﾟ) + (ﾟΘﾟ))", "9")
+		aastring = aastring.replace("((ﾟｰﾟ) + (ﾟｰﾟ))", "8")
+		aastring = aastring.replace("((ﾟｰﾟ) + (o^_^o))", "7")
+		aastring = aastring.replace("((o^_^o) +(o^_^o))", "6")
+		aastring = aastring.replace("((ﾟｰﾟ) + (ﾟΘﾟ))", "5")
+		aastring = aastring.replace("(ﾟｰﾟ)", "4")
+		aastring = aastring.replace("((o^_^o) - (ﾟΘﾟ))", "2")
+		aastring = aastring.replace("(o^_^o)", "3")
+		aastring = aastring.replace("(ﾟΘﾟ)", "1")
+		aastring = aastring.replace("(+!+[])", "1")
+		aastring = aastring.replace("(c^_^o)", "0")
+		aastring = aastring.replace("(0+0)", "0")
+		aastring = aastring.replace("(ﾟДﾟ)[ﾟεﾟ]", "\\")
+		aastring = aastring.replace("(3 +3 +0)", "6")
+		aastring = aastring.replace("(3 - 1 +0)", "2")
+		aastring = aastring.replace("(!+[]+!+[])", "2")
+		aastring = aastring.replace("(-~-~2)", "4")
+		aastring = aastring.replace("(-~-~1)", "3")
+		print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> \n %s <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n" % aastring)
+
+		decodestring = re.search(r"\\\+([^(]+)", aastring, re.DOTALL | re.IGNORECASE).group(1)
+		decodestring = "\\+"+ decodestring
+		decodestring = decodestring.replace("+","")
+		decodestring = decodestring.replace(" ","")
+
+		decodestring = self.decode(decodestring)
+		decodestring = decodestring.replace("\\/","/")
+		print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> \n %s <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n" % decodestring)
+		videourl = re.compile("window.vr='([^']+)'").findall(decodestring)
+		print("videp",videourl)
+		if len(videourl)>0:
+			linkvideo = videourl[0]
+		else:
+			linkvideo=''
+		return linkvideo
+
+	def decode(self, encoded):
+		for octc in (c for c in re.findall(r'\\(\d{2,3})', encoded)):
+			encoded = encoded.replace(r'\%s' % octc, chr(int(octc, 8)))
+		return encoded.decode('utf8')
+
 	def getMediaUrl(self):
 
 		content = self.net.http_GET(self.url, headers=self.headers).content
+
+		videoUrl = self.decodeOpenLoad(str(content.encode('utf-8')))
+
+		print videoUrl
+
+		return videoUrl
 
 		"""soup = BeautifulSoup(content)
 
@@ -53,15 +102,30 @@ class OpenLoad():
 			if aadecoded.is_aaencoded():
 				video_url = aadecoded.decode()
 
-		print video_url1"""
+		print video_url1
 
 		aascript = re.compile('<script type="text\/javascript">(.+?)<\/script>').findall(content)
-		pprint.pprint(aascript)
+
+		dataJs = ''
+
+		mat = re.finditer('(eval\(function.*?)</script>', str(aascript[1].encode('utf-8')), re.DOTALL)
+
+		print "AQUI AQUI AQUI AQUI AQUI AQUI AQUI"
+
+		print mat
+
+		for pack in re.finditer('(eval\(function.*?)</script>', str(aascript[1].encode('utf-8')), re.DOTALL):
+			dataJs = jsunpacker.unpack(pack.group(1))
+
+		print dataJs
+
+		print "====================================>"
+		print str(aascript[1].encode('utf-8'))
 		string = AADecoder.AADecoder(str(aascript[1].encode('utf-8'))).decode()
 		video_url = string.replace('window.vr ="','',1).replace('";window.vt ="video/mp4" ;','',1)
 
 		print video_url
-		return video_url
+		return video_url"""
 
 	def getMediaUrlOld(self):
 
@@ -185,10 +249,16 @@ class Vidzi():
 		else:
 			for pack in re.finditer('(eval\(function.*?)</script>', sourceCode, re.DOTALL):
 				dataJs = jsunpacker.unpack(pack.group(1)) # Unpacker for Dean Edward's p.a.c.k.e.r | THKS
+
+				print dataJs
+				#pprint.pprint(dataJs)
+
 				stream = re.search('file\s*:\s*"([^"]+)', dataJs)
-				subtitle = re.compile('tracks: \[\{ file: "(.+?)\.srt"').findall(dataJs)[0]
+				"""
+				subtitle = re.compile('tracks:\[\{file:"(.+?)\.srt"').findall(dataJs)[0]
 				subtitle += ".srt"
-				self.subtitle = subtitle
+				self.subtitle = subtitle"""
+				self.subtitle = "Nao tem legenda!"
 				if stream:
 					return stream.group(1)
 

@@ -1,3 +1,7 @@
+v0.1.5 (18/02/2016)
+- OpenLoad fix
+- Vidzi fix
+
 v0.1.4 (09/02/2016)
 - Correção de numero de temporadas
 

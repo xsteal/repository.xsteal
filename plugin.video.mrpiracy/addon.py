@@ -90,7 +90,7 @@ def login():
 
             match = re.compile('class="myAccount">(.+?)<\/a>').findall(codigo_fonte)
 
-            print codigo_fonte
+           
 
         except:
             resultado = False
